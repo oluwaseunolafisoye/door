@@ -96,14 +96,22 @@ export default function ApplicationPage({
     [coverLetterData]
   )
 
+  const shell = "dark flex h-full flex-col overflow-hidden bg-[#0c1a1a]"
+  const dotGrid = {
+    backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
+    backgroundSize: "24px 24px",
+  }
+
   // Loading state
   if (application === undefined) {
     return (
-      <div className="space-y-4 p-8">
-        <Skeleton className="h-8 w-64" />
-        <div className="grid h-[80vh] grid-cols-2 gap-6">
-          <Skeleton className="rounded-xl" />
-          <Skeleton className="rounded-xl" />
+      <div className={shell} style={dotGrid}>
+        <div className="space-y-4 p-8">
+          <Skeleton className="h-8 w-64 opacity-20" />
+          <div className="grid h-[80vh] grid-cols-2 gap-6">
+            <Skeleton className="rounded-2xl opacity-20" />
+            <Skeleton className="rounded-2xl opacity-20" />
+          </div>
         </div>
       </div>
     )
@@ -111,37 +119,37 @@ export default function ApplicationPage({
 
   if (!application) {
     return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <p className="text-sm text-muted-foreground">Application not found.</p>
+      <div className={shell} style={dotGrid}>
+        <div className="flex h-[60vh] items-center justify-center">
+          <p className="text-sm text-white/40">Application not found.</p>
+        </div>
       </div>
     )
   }
 
-  // Processing skeleton
+  // Processing state
   if (application.status === "processing") {
     return (
-      <div className="space-y-6 p-8">
-        <div className="flex items-center gap-3">
+      <div className={shell} style={dotGrid}>
+        <div className="flex items-center gap-3 border-b border-white/8 px-6 py-3">
           <Link href="/">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-white/50 hover:bg-white/10 hover:text-white">
               <ArrowLeft className="size-4" />
             </Button>
           </Link>
           <div>
-            <h1 className="text-xl font-semibold">{application.jobTitle}</h1>
-            <p className="text-xs text-muted-foreground">
-              {application.company}
-            </p>
+            <h1 className="text-sm font-semibold text-white">{application.jobTitle}</h1>
+            <p className="text-[11px] text-white/40">{application.company}</p>
           </div>
         </div>
-
-        <div className="flex flex-col items-center justify-center gap-4 py-24">
-          <Loader2 className="size-8 animate-spin text-chart-1" />
-          <div className="space-y-1 text-center">
-            <p className="text-sm font-medium">Tailoring your CV with AI...</p>
-            <p className="text-xs text-muted-foreground">
-              Applying CARL framework, optimizing action verbs, and generating
-              your cover letter.
+        <div className="flex flex-1 flex-col items-center justify-center gap-5">
+          <div className="flex size-14 items-center justify-center rounded-2xl border border-[#a4f5a6]/20 bg-[#a4f5a6]/10">
+            <Loader2 className="size-6 animate-spin text-[#a4f5a6]" />
+          </div>
+          <div className="space-y-1.5 text-center">
+            <p className="text-sm font-semibold text-white">Tailoring your CV with AI...</p>
+            <p className="text-xs text-white/40">
+              Applying CARL framework, optimizing action verbs, and generating your cover letter.
             </p>
           </div>
         </div>
@@ -152,34 +160,30 @@ export default function ApplicationPage({
   // Failed state
   if (application.status === "failed") {
     return (
-      <div className="space-y-6 p-8">
-        <div className="flex items-center gap-3">
+      <div className={shell} style={dotGrid}>
+        <div className="flex items-center gap-3 border-b border-white/8 px-6 py-3">
           <Link href="/">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-white/50 hover:bg-white/10 hover:text-white">
               <ArrowLeft className="size-4" />
             </Button>
           </Link>
           <div>
-            <h1 className="text-xl font-semibold">{application.jobTitle}</h1>
-            <p className="text-xs text-muted-foreground">
-              {application.company}
-            </p>
+            <h1 className="text-sm font-semibold text-white">{application.jobTitle}</h1>
+            <p className="text-[11px] text-white/40">{application.company}</p>
           </div>
         </div>
-
-        <div className="flex flex-col items-center justify-center gap-4 py-24">
-          <div className="flex size-12 items-center justify-center rounded-full bg-destructive/10">
+        <div className="flex flex-1 flex-col items-center justify-center gap-5">
+          <div className="flex size-14 items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/10">
             <XCircle className="size-6 text-destructive" />
           </div>
-          <div className="space-y-1 text-center">
-            <p className="text-sm font-medium">Tailoring failed</p>
-            <p className="text-xs text-muted-foreground">
-              Something went wrong while optimizing your CV. Please go back and
-              try again.
+          <div className="space-y-1.5 text-center">
+            <p className="text-sm font-semibold text-white">Tailoring failed</p>
+            <p className="text-xs text-white/40">
+              Something went wrong while optimizing your CV. Please go back and try again.
             </p>
           </div>
           <Link href="/">
-            <Button variant="outline" size="sm" className="gap-1.5">
+            <Button size="sm" className="gap-1.5 bg-[#a4f5a6] text-[#0c1a1a] hover:bg-[#a4f5a6]/90">
               <ArrowLeft className="size-3" />
               Back to Dashboard
             </Button>
@@ -190,29 +194,27 @@ export default function ApplicationPage({
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div className={shell} style={dotGrid}>
       {/* Top bar */}
-      <div className="flex items-center justify-between border-b px-6 py-3">
+      <div className="flex items-center justify-between border-b border-white/8 px-6 py-3">
         <div className="flex items-center gap-3">
           <Link href="/">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-white/50 hover:bg-white/10 hover:text-white">
               <ArrowLeft className="size-4" />
             </Button>
           </Link>
           <div>
-            <h1 className="text-sm font-semibold">{application.jobTitle}</h1>
-            <p className="text-[11px] text-muted-foreground">
-              {application.company}
-            </p>
+            <h1 className="text-sm font-semibold text-white">{application.jobTitle}</h1>
+            <p className="text-[11px] text-white/40">{application.company}</p>
           </div>
         </div>
 
-        {/* Floating toolbar */}
-        <div className="flex items-center gap-2 rounded-2xl border bg-background px-3 py-1.5 shadow-sm">
+        {/* Toolbar */}
+        <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-sm">
           <Button
             variant="ghost"
             size="sm"
-            className="gap-1.5 text-xs"
+            className="gap-1.5 text-xs text-white/60 hover:bg-white/10 hover:text-white"
             onClick={handleSave}
             disabled={isSaving}
           >
@@ -223,7 +225,7 @@ export default function ApplicationPage({
             )}
             Save
           </Button>
-          <Separator orientation="vertical" className="h-4" />
+          <Separator orientation="vertical" className="h-4 bg-white/10" />
           <PDFPreview
             resumeData={currentResumeData}
             coverLetterData={currentCoverLetterData}
@@ -236,16 +238,16 @@ export default function ApplicationPage({
 
       {/* Split pane */}
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-2">
-        {/* Left: Form editor */}
-        <div className="overflow-y-auto border-r">
+        {/* Left: editor */}
+        <div className="overflow-y-auto border-r border-white/8">
           <div className="p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-6">
-                <TabsTrigger value="resume" className="gap-1.5 text-xs">
+              <TabsList className="mb-6 border border-white/10 bg-white/5">
+                <TabsTrigger value="resume" className="gap-1.5 text-xs data-[state=active]:bg-[#a4f5a6] data-[state=active]:text-[#0c1a1a]">
                   <FileText className="size-3" />
                   Resume
                 </TabsTrigger>
-                <TabsTrigger value="coverLetter" className="gap-1.5 text-xs">
+                <TabsTrigger value="coverLetter" className="gap-1.5 text-xs data-[state=active]:bg-[#a4f5a6] data-[state=active]:text-[#0c1a1a]">
                   <Mail className="size-3" />
                   Cover Letter
                 </TabsTrigger>
@@ -264,7 +266,7 @@ export default function ApplicationPage({
                     }))
                   }
                 />
-                <Separator />
+                <Separator className="bg-white/8" />
                 <ExperienceSection
                   data={currentResumeData.experience}
                   onChange={(experience) =>
@@ -275,7 +277,7 @@ export default function ApplicationPage({
                   }
                   optimizations={optimizationAnalysis?.experienceOptimizations}
                 />
-                <Separator />
+                <Separator className="bg-white/8" />
                 <EducationSection
                   data={currentResumeData.education}
                   onChange={(education) =>
@@ -285,7 +287,7 @@ export default function ApplicationPage({
                     }))
                   }
                 />
-                <Separator />
+                <Separator className="bg-white/8" />
                 <SkillsSection
                   data={currentResumeData.skills}
                   onChange={(skills) =>
@@ -295,7 +297,7 @@ export default function ApplicationPage({
                     }))
                   }
                 />
-                <Separator />
+                <Separator className="bg-white/8" />
                 <ProjectsSection
                   data={currentResumeData.projects}
                   onChange={(projects) =>
@@ -305,7 +307,7 @@ export default function ApplicationPage({
                     }))
                   }
                 />
-                <Separator />
+                <Separator className="bg-white/8" />
                 <CertificationsSection
                   data={currentResumeData.certifications}
                   onChange={(certifications) =>
@@ -328,7 +330,7 @@ export default function ApplicationPage({
         </div>
 
         {/* Right: PDF preview */}
-        <div className="hidden overflow-hidden bg-muted/30 lg:block">
+        <div className="hidden overflow-hidden bg-[#071212] lg:block">
           <PDFPreview
             resumeData={currentResumeData}
             coverLetterData={currentCoverLetterData}

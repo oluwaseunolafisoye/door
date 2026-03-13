@@ -4,13 +4,9 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { useTheme } from "next-themes"
-import { Moon, Sun } from "lucide-react"
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const { resolvedTheme, setTheme } = useTheme()
 
   const navItems = [
     { label: "Dashboard", href: "/" },
@@ -24,52 +20,46 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-sm">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+    <div
+      className="dark flex min-h-svh flex-col bg-[#0c1a1a]"
+      style={{
+        backgroundImage:
+          "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
+        backgroundSize: "24px 24px",
+      }}
+    >
+      <header className="sticky top-0 z-50 border-b border-white/8 bg-[#0c1a1a]/80 backdrop-blur-sm">
+        <div className="mx-auto flex h-14 max-w-6xl items-center px-6">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
               <Image src="/door.svg" alt="door" width={20} height={20} />
-              <span className="text-sm font-semibold tracking-tight">door</span>
+              <span className="text-sm font-semibold tracking-tight text-white">
+                door
+              </span>
             </Link>
 
-            <nav className="flex items-center gap-1">
+            <nav className="flex items-center gap-0.5">
               {navItems.map((item) => (
-                <Link key={item.href} href={item.href}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      "text-xs",
-                      pathname === item.href && "bg-muted text-foreground"
-                    )}
-                  >
-                    {item.label}
-                  </Button>
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "rounded-lg px-3 py-1.5 text-xs transition-colors",
+                    pathname === item.href
+                      ? "bg-white/10 text-white"
+                      : "text-white/50 hover:bg-white/5 hover:text-white/80"
+                  )}
+                >
+                  {item.label}
                 </Link>
               ))}
             </nav>
           </div>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() =>
-              setTheme(resolvedTheme === "dark" ? "light" : "dark")
-            }
-          >
-            <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-            <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          </Button>
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden bg-muted/50">
-        {pathname.startsWith("/application") ? (
-          children
-        ) : (
-          <div className="mx-auto max-w-6xl px-6 py-8">{children}</div>
-        )}
+      <main className="flex-1">
+        <div className="mx-auto max-w-6xl px-6 py-8">{children}</div>
       </main>
     </div>
   )

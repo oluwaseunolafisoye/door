@@ -33,11 +33,13 @@ export default function HistoryPage() {
     setDeletingId(null)
   }
 
+  const glassCard = "bg-white/5 border-white/10 backdrop-blur-sm"
+
   return (
     <div className="space-y-8">
       <div className="space-y-1">
-        <h1 className="text-3xl font-semibold tracking-tight">History</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-3xl font-semibold tracking-tight text-white">History</h1>
+        <p className="text-sm text-white/50">
           All your tailored applications in one place.
         </p>
       </div>
@@ -45,31 +47,33 @@ export default function HistoryPage() {
       {applications === undefined ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-36 rounded-xl" />
+            <Skeleton key={i} className="h-36 rounded-xl opacity-20" />
           ))}
         </div>
       ) : applications.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-          <div className="rounded-full bg-muted p-5">
-            <Inbox className="size-8 text-muted-foreground/50" />
+          <div className="rounded-full bg-white/10 p-5">
+            <Inbox className="size-8 text-white/30" />
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-medium">No applications yet</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm font-medium text-white">No applications yet</p>
+            <p className="text-xs text-white/50">
               Upload a CV from the dashboard to get started.
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => router.push("/")}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push("/")}
+            className="border-white/20 text-white/70 hover:bg-white/10 hover:text-white"
+          >
             Go to Dashboard
           </Button>
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {applications.map((app: Doc<"applications">) => (
-            <Card
-              key={app._id}
-              className="group relative"
-            >
+            <Card key={app._id} className={cn("group relative", glassCard)}>
               <CardContent className="flex h-full flex-col justify-between p-5">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -78,23 +82,23 @@ export default function HistoryPage() {
                       className={cn(
                         "text-[10px]",
                         app.status === "completed" &&
-                          "bg-[#a4f5a6]/30 text-[#1a5c1d]",
+                          "bg-[#a4f5a6]/20 text-[#a4f5a6]",
                         app.status === "processing" &&
-                          "bg-amber-500/10 text-amber-600",
+                          "bg-amber-500/20 text-amber-400",
                         app.status === "failed" &&
-                          "bg-destructive/10 text-destructive"
+                          "bg-destructive/20 text-red-400"
                       )}
                     >
                       {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                     </Badge>
-                    <p className="text-[10px] text-muted-foreground">
+                    <p className="text-[10px] text-white/30">
                       {new Date(app.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <h3 className="text-sm leading-snug font-medium">
+                  <h3 className="text-sm leading-snug font-medium text-white">
                     {app.jobTitle}
                   </h3>
-                  <p className="text-xs text-muted-foreground">{app.company}</p>
+                  <p className="text-xs text-white/50">{app.company}</p>
                 </div>
 
                 <div className="mt-4 flex items-center justify-between">
@@ -107,7 +111,7 @@ export default function HistoryPage() {
                           e.stopPropagation()
                           setDeletingId(app._id)
                         }}
-                        className="text-muted-foreground hover:text-destructive"
+                        className="text-white/30 hover:bg-white/10 hover:text-red-400"
                       >
                         <Trash2 className="size-3" />
                       </Button>
@@ -138,7 +142,7 @@ export default function HistoryPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="gap-1 text-xs"
+                    className="gap-1 text-xs text-white/50 hover:bg-white/10 hover:text-white"
                     onClick={() => router.push(`/application/${app._id}`)}
                   >
                     Open
