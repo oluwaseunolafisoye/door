@@ -31,8 +31,8 @@ type FlowStep = "idle" | "uploaded" | "submitting"
 
 function CircularProgress({
   value,
-  size = 120,
-  strokeWidth = 10,
+  size = 88,
+  strokeWidth = 8,
   label,
   sublabel,
 }: {
@@ -74,28 +74,16 @@ function CircularProgress({
           className="transition-all duration-1000 ease-out"
         />
         <defs>
-          <linearGradient
-            id="progress-gradient"
-            x1="0%"
-            y1="0%"
-            x2="100%"
-            y2="0%"
-          >
+          <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#a4f5a6" />
             <stop offset="100%" stopColor="#a4f5a6" />
           </linearGradient>
         </defs>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-2xl font-bold tracking-tight text-white">
-          {value}%
-        </span>
-        {label && (
-          <span className="text-[10px] font-medium text-white/50">{label}</span>
-        )}
-        {sublabel && (
-          <span className="text-[9px] text-white/30">{sublabel}</span>
-        )}
+        <span className="text-xl font-bold tracking-tight text-white">{value}%</span>
+        {label && <span className="text-[9px] font-medium text-white/50">{label}</span>}
+        {sublabel && <span className="text-[8px] text-white/30">{sublabel}</span>}
       </div>
     </div>
   )
@@ -104,7 +92,7 @@ function CircularProgress({
 export default function DashboardPage() {
   const router = useRouter()
   const stats = useQuery(api.applications.aggregateStats)
-  const recentApps = useQuery(api.applications.listRecent, { limit: 4 })
+  const recentApps = useQuery(api.applications.listRecent, { limit: 3 })
   const latestCv = useQuery(api.cvs.getLatest)
   const createApplication = useMutation(api.applications.create)
   const tailorResume = useAction(api.aiActions.tailorResume)
@@ -119,37 +107,20 @@ export default function DashboardPage() {
   const effectiveCvId = cvId ?? (hasExistingCv ? latestCv._id : null)
   const effectiveParsedData = parsedData ?? (hasExistingCv ? (latestCv.parsedData as ResumeData) : null)
 
-  const handleUploadComplete = useCallback(
-    (id: Id<"cvs">, data: ResumeData) => {
-      setCvId(id)
-      setParsedData(data)
-      setStep("uploaded")
-      setShowUploadNew(false)
-    },
-    []
-  )
+  const handleUploadComplete = useCallback((id: Id<"cvs">, data: ResumeData) => {
+    setCvId(id)
+    setParsedData(data)
+    setStep("uploaded")
+    setShowUploadNew(false)
+  }, [])
 
   const handleJobSubmit = useCallback(
-    async (job: {
-      jobTitle: string
-      company: string
-      jobDescription: string
-    }) => {
+    async (job: { jobTitle: string; company: string; jobDescription: string }) => {
       if (!effectiveCvId || !effectiveParsedData) return
       setIsSubmitting(true)
-
       try {
-        const appId = await createApplication({
-          cvId: effectiveCvId,
-          ...job,
-        })
-
-        tailorResume({
-          applicationId: appId,
-          resumeData: effectiveParsedData,
-          ...job,
-        })
-
+        const appId = await createApplication({ cvId: effectiveCvId, ...job })
+        tailorResume({ applicationId: appId, resumeData: effectiveParsedData, ...job })
         router.push(`/application/${appId}`)
       } catch {
         setIsSubmitting(false)
@@ -158,44 +129,49 @@ export default function DashboardPage() {
     [effectiveCvId, effectiveParsedData, createApplication, tailorResume, router]
   )
 
-  const glassCard = "bg-white/5 border-white/10 backdrop-blur-sm"
+  const g = "bg-white/5 border-white/10 backdrop-blur-sm"
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-white">
+      <div>
+        <h1 className="text-xl font-semibold tracking-tight text-white">
           {step === "uploaded" || (hasExistingCv && step === "idle" && !showUploadNew)
             ? "Target Role"
             : "Welcome back"}
         </h1>
-        <p className="text-sm text-white/50">
+        <p className="text-xs text-white/40 mt-0.5">
           {step === "uploaded" || (hasExistingCv && step === "idle" && !showUploadNew)
             ? "Tell us about the job you're applying for."
             : "Your CV optimization overview."}
         </p>
       </div>
 
-      {/* Bento grid */}
-      <div className="grid grid-cols-3 gap-6">
+      {/*
+        Grid layout (3 cols):
+        Row 1-2: [Hero 2×2]          [Score 1×1]
+        Row 2:   [Hero...]            [This Week 1×1]
+        Row 3:   [Keywords] [Total]   [Top Skills 1×2]
+        Row 4:   [Recent Apps 2×1]    [Top Skills cont.]
+      */}
+      <div className="grid grid-cols-3 gap-4">
 
         {/* Hero — cols 1-2, rows 1-2 */}
-        <Card className={cn("relative col-span-2 row-span-2 overflow-hidden", glassCard)}>
-          <div className="pointer-events-none absolute -top-20 -right-20 size-64 rounded-full bg-[#a4f5a6]/5 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-16 -left-16 size-48 rounded-full bg-[#a4f5a6]/3 blur-3xl" />
-          <CardContent className="relative flex h-full min-h-80 flex-col justify-center p-8">
+        <Card className={cn("relative col-span-2 row-span-2 overflow-hidden", g)}>
+          <div className="pointer-events-none absolute -top-16 -right-16 size-48 rounded-full bg-[#a4f5a6]/5 blur-3xl" />
+          <CardContent className="relative flex h-full flex-col justify-center p-6">
             {(step === "uploaded" || (hasExistingCv && step === "idle" && !showUploadNew)) ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex size-9 items-center justify-center rounded-xl bg-[#a4f5a6]/10">
-                      <Sparkles className="size-4.5 text-[#a4f5a6]" />
+                    <div className="flex size-8 items-center justify-center rounded-xl bg-[#a4f5a6]/10">
+                      <Sparkles className="size-4 text-[#a4f5a6]" />
                     </div>
                     <div>
-                      <h2 className="text-base font-semibold text-white">New Application</h2>
-                      <p className="text-[11px] text-white/40">
+                      <h2 className="text-sm font-semibold text-white">New Application</h2>
+                      <p className="text-[10px] text-white/40">
                         Using{" "}
-                        <span className="font-medium text-white/70">
+                        <span className="font-medium text-white/60">
                           {hasExistingCv && !cvId ? latestCv.fileName : "uploaded CV"}
                         </span>
                       </p>
@@ -204,23 +180,23 @@ export default function DashboardPage() {
                   <button
                     type="button"
                     onClick={() => setShowUploadNew(true)}
-                    className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] text-white/40 transition-colors hover:bg-white/10 hover:text-white/70"
+                    className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[10px] text-white/40 transition-colors hover:bg-white/10 hover:text-white/70"
                   >
                     <RefreshCw className="size-3" />
-                    Upload new CV
+                    New CV
                   </button>
                 </div>
                 <JobDescriptionForm onSubmit={handleJobSubmit} isLoading={isSubmitting} />
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <div className="flex items-center gap-2.5">
-                  <div className="flex size-9 items-center justify-center rounded-xl bg-[#a4f5a6]/10">
-                    <Sparkles className="size-4.5 text-[#a4f5a6]" />
+                  <div className="flex size-8 items-center justify-center rounded-xl bg-[#a4f5a6]/10">
+                    <Sparkles className="size-4 text-[#a4f5a6]" />
                   </div>
                   <div>
-                    <h2 className="text-base font-semibold text-white">New Application</h2>
-                    <p className="text-[11px] text-white/40">Upload your CV to get started</p>
+                    <h2 className="text-sm font-semibold text-white">New Application</h2>
+                    <p className="text-[10px] text-white/40">Upload your CV to get started</p>
                   </div>
                 </div>
                 <CVUpload onUploadComplete={handleUploadComplete} />
@@ -229,168 +205,102 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Optimization Score — col 3, rows 1-2 */}
-        <Card className={cn("relative row-span-2 overflow-hidden", glassCard)}>
-          <div className="pointer-events-none absolute -top-12 -right-12 size-32 rounded-full bg-[#a4f5a6]/5 blur-2xl" />
-          <CardContent className="relative flex h-full flex-col items-center justify-center gap-3 p-6">
+        {/* Optimization Score — col 3, row 1 (compact) */}
+        <Card className={cn("relative overflow-hidden", g)}>
+          <div className="pointer-events-none absolute -top-8 -right-8 size-24 rounded-full bg-[#a4f5a6]/5 blur-2xl" />
+          <CardContent className="relative flex h-full flex-col items-center justify-center gap-2 p-4">
             {stats === undefined ? (
-              <Skeleton className="size-28 rounded-full opacity-20" />
+              <Skeleton className="size-20 rounded-full opacity-20" />
             ) : stats.appsWithAnalysis > 0 ? (
               <>
                 <CircularProgress
                   value={stats.avgKeywordPercent}
                   label="Keyword Match"
-                  sublabel={`across ${stats.appsWithAnalysis} app${stats.appsWithAnalysis !== 1 ? "s" : ""}`}
+                  sublabel={`${stats.appsWithAnalysis} app${stats.appsWithAnalysis !== 1 ? "s" : ""}`}
                 />
-                <div className="mt-1 w-full space-y-2">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-white/40">Requirements</span>
-                    <span className="font-medium text-white/80">{stats.avgRequirementPercent}%</span>
+                <div className="w-full space-y-1">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-white/40">Req. coverage</span>
+                    <span className="font-medium text-white/70">{stats.avgRequirementPercent}%</span>
                   </div>
-                  <Progress value={stats.avgRequirementPercent} className="[&>div]:bg-[#a4f5a6]">{null}</Progress>
+                  <Progress value={stats.avgRequirementPercent} className="h-1 [&>div]:bg-[#a4f5a6]">{null}</Progress>
                 </div>
               </>
             ) : (
               <div className="flex flex-col items-center gap-2 text-center">
-                <div className="flex size-14 items-center justify-center rounded-full bg-white/10">
-                  <Target className="size-6 text-white/30" />
+                <div className="flex size-10 items-center justify-center rounded-full bg-white/10">
+                  <Target className="size-4 text-white/30" />
                 </div>
-                <p className="text-xs text-white/40">
-                  Optimization score appears after your first tailored application
+                <p className="text-[10px] text-white/40 leading-snug">
+                  Score appears after first application
                 </p>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* This Week — col 1, row 3 */}
-        <Card className={cn("relative overflow-hidden", glassCard)}>
-          <div className="pointer-events-none absolute -right-8 -bottom-8 size-24 rounded-full bg-[#a4f5a6]/5 blur-2xl" />
-          <CardContent className="relative flex h-full items-center gap-4 p-5">
-            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#a4f5a6]/10">
-              <TrendingUp className="size-5 text-[#a4f5a6]" />
+        {/* This Week — col 3, row 2 */}
+        <Card className={cn("relative overflow-hidden", g)}>
+          <div className="pointer-events-none absolute -right-6 -bottom-6 size-16 rounded-full bg-[#a4f5a6]/5 blur-xl" />
+          <CardContent className="relative flex h-full items-center gap-3 p-4">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#a4f5a6]/10">
+              <TrendingUp className="size-4 text-[#a4f5a6]" />
             </div>
             <div>
-              <p className="text-3xl font-bold tracking-tight text-white">{stats?.thisWeek ?? "—"}</p>
-              <p className="text-[11px] text-white/40">This week</p>
+              <p className="text-2xl font-bold tracking-tight text-white leading-none">{stats?.thisWeek ?? "—"}</p>
+              <p className="text-[10px] text-white/40 mt-0.5">This week</p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Keywords — col 2, row 3 */}
-        <Card className={cn("relative overflow-hidden", glassCard)}>
-          <div className="pointer-events-none absolute -top-8 -left-8 size-24 rounded-full bg-white/3 blur-2xl" />
-          <CardContent className="relative space-y-3 p-5">
-            <div className="flex items-center gap-3">
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                <Zap className="size-4 text-white/70" />
+        {/* Keywords — col 1, row 3 */}
+        <Card className={cn("relative overflow-hidden", g)}>
+          <CardContent className="relative space-y-2.5 p-4">
+            <div className="flex items-center gap-2.5">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                <Zap className="size-3.5 text-white/60" />
               </div>
               <div>
-                <p className="text-lg font-bold text-white">{stats?.totalBulletsOptimized ?? "—"}</p>
-                <p className="text-[11px] text-white/40">Bullets optimized</p>
+                <p className="text-lg font-bold text-white leading-none">{stats?.totalBulletsOptimized ?? "—"}</p>
+                <p className="text-[10px] text-white/40">Bullets optimized</p>
               </div>
             </div>
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-[11px]">
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-[10px]">
                 <span className="text-white/40">Keywords placed</span>
-                <span className="font-medium tabular-nums text-white/70">
+                <span className="font-medium tabular-nums text-white/60">
                   {stats ? `${stats.totalKeywordsMatched}/${stats.totalKeywords}` : "—"}
                 </span>
               </div>
-              <Progress value={stats?.avgKeywordPercent ?? 0} className="[&>div]:bg-[#a4f5a6]">{null}</Progress>
+              <Progress value={stats?.avgKeywordPercent ?? 0} className="h-1 [&>div]:bg-[#a4f5a6]">{null}</Progress>
             </div>
           </CardContent>
         </Card>
 
-        {/* Total — col 3, row 3 */}
-        <Card className={cn("relative overflow-hidden", glassCard)}>
-          <div className="pointer-events-none absolute -bottom-8 -left-8 size-24 rounded-full bg-white/3 blur-2xl" />
-          <CardContent className="relative flex h-full items-center gap-4 p-5">
-            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/10">
-              <FileText className="size-5 text-white/70" />
+        {/* Total — col 2, row 3 */}
+        <Card className={cn("relative overflow-hidden", g)}>
+          <CardContent className="relative flex h-full items-center gap-3 p-4">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/10">
+              <FileText className="size-4 text-white/60" />
             </div>
             <div>
-              <p className="text-3xl font-bold tracking-tight text-white">{stats?.total ?? "—"}</p>
-              <p className="text-[11px] text-white/40">Total applications</p>
+              <p className="text-2xl font-bold tracking-tight text-white leading-none">{stats?.total ?? "—"}</p>
+              <p className="text-[10px] text-white/40 mt-0.5">Total applications</p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Recent Applications — cols 1-2, rows 4-5 */}
-        <Card className={cn("col-span-2 row-span-2", glassCard)}>
-          <CardContent className="p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Clock className="size-3.5 text-white/30" />
-                <h3 className="text-xs font-semibold text-white/80">Recent Applications</h3>
-              </div>
-              {recentApps && recentApps.length > 0 && (
-                <button
-                  onClick={() => router.push("/history")}
-                  className="text-[11px] text-white/40 transition-colors hover:text-white/70"
-                >
-                  View all →
-                </button>
-              )}
-            </div>
-            <div className="space-y-2">
-              {recentApps === undefined ? (
-                <>
-                  <Skeleton className="h-14 rounded-xl opacity-20" />
-                  <Skeleton className="h-14 rounded-xl opacity-20" />
-                  <Skeleton className="h-14 rounded-xl opacity-20" />
-                </>
-              ) : recentApps.length > 0 ? (
-                recentApps.map((app: Doc<"applications">) => (
-                  <button
-                    key={app._id}
-                    type="button"
-                    onClick={() => router.push(`/application/${app._id}`)}
-                    className="group flex w-full items-center justify-between rounded-xl bg-white/5 px-4 py-3 text-left transition-all hover:bg-white/10"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "size-2 shrink-0 rounded-full",
-                        app.status === "completed" && "bg-[#a4f5a6]",
-                        app.status === "processing" && "animate-pulse bg-amber-400",
-                        app.status === "failed" && "bg-destructive"
-                      )} />
-                      <div>
-                        <p className="text-sm font-medium text-white">{app.jobTitle}</p>
-                        <p className="text-[11px] text-white/40">
-                          {app.company} · {new Date(app.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <ArrowRight className="size-3.5 text-white/30 opacity-0 transition-opacity group-hover:opacity-100" />
-                  </button>
-                ))
-              ) : (
-                <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
-                  <div className="flex size-10 items-center justify-center rounded-full bg-white/10">
-                    <Briefcase className="size-4 text-white/30" />
-                  </div>
-                  <p className="text-xs text-white/40">
-                    No applications yet — upload a CV to get started
-                  </p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Top Matched Skills — col 3, rows 4-5 */}
-        <Card className={cn("relative row-span-2 overflow-hidden", glassCard)}>
-          <div className="pointer-events-none absolute -top-16 -right-16 size-48 rounded-full bg-white/3 blur-3xl" />
-          <CardContent className="relative p-5">
-            <div className="mb-3 flex items-center gap-2">
-              <CheckCircle2 className="size-3.5 text-white/30" />
-              <h3 className="text-xs font-semibold text-white/80">Top Matched Skills</h3>
+        {/* Top Matched Skills — col 3, rows 3-4 */}
+        <Card className={cn("relative row-span-2 overflow-hidden", g)}>
+          <CardContent className="relative p-4">
+            <div className="mb-2.5 flex items-center gap-1.5">
+              <CheckCircle2 className="size-3 text-white/30" />
+              <h3 className="text-[11px] font-semibold text-white/70">Top Skills</h3>
             </div>
             {stats === undefined ? (
-              <div className="flex flex-wrap gap-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-6 w-20 rounded-full opacity-20" />
+              <div className="flex flex-wrap gap-1.5">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={i} className="h-5 w-16 rounded-full opacity-20" />
                 ))}
               </div>
             ) : stats.topSkills.length > 0 ? (
@@ -400,22 +310,82 @@ export default function DashboardPage() {
                     key={skill}
                     variant="secondary"
                     className={cn(
-                      "text-[11px] font-normal",
+                      "text-[10px] font-normal px-2 py-0.5",
                       i < 3
                         ? "bg-[#a4f5a6]/15 text-[#a4f5a6] hover:bg-[#a4f5a6]/25"
-                        : "bg-white/10 text-white/60 hover:bg-white/15"
+                        : "bg-white/8 text-white/50 hover:bg-white/15"
                     )}
                   >
                     {skill}
-                    <span className="ml-1 opacity-50">×{count}</span>
+                    <span className="ml-1 opacity-40">×{count}</span>
                   </Badge>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-white/40">
-                Matched skills appear after your first optimized application
+              <p className="text-[10px] text-white/40 leading-snug">
+                Skills appear after your first optimized application
               </p>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Recent Applications — cols 1-2, row 4 */}
+        <Card className={cn("col-span-2", g)}>
+          <CardContent className="p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Clock className="size-3 text-white/30" />
+                <h3 className="text-[11px] font-semibold text-white/70">Recent</h3>
+              </div>
+              {recentApps && recentApps.length > 0 && (
+                <button
+                  onClick={() => router.push("/history")}
+                  className="text-[10px] text-white/40 transition-colors hover:text-white/70"
+                >
+                  View all →
+                </button>
+              )}
+            </div>
+            <div className="space-y-1.5">
+              {recentApps === undefined ? (
+                <>
+                  <Skeleton className="h-10 rounded-lg opacity-20" />
+                  <Skeleton className="h-10 rounded-lg opacity-20" />
+                </>
+              ) : recentApps.length > 0 ? (
+                recentApps.map((app: Doc<"applications">) => (
+                  <button
+                    key={app._id}
+                    type="button"
+                    onClick={() => router.push(`/application/${app._id}`)}
+                    className="group flex w-full items-center justify-between rounded-lg bg-white/5 px-3 py-2 text-left transition-all hover:bg-white/10"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className={cn(
+                        "size-1.5 shrink-0 rounded-full",
+                        app.status === "completed" && "bg-[#a4f5a6]",
+                        app.status === "processing" && "animate-pulse bg-amber-400",
+                        app.status === "failed" && "bg-destructive"
+                      )} />
+                      <div>
+                        <p className="text-xs font-medium text-white leading-none">{app.jobTitle}</p>
+                        <p className="text-[10px] text-white/40 mt-0.5">
+                          {app.company} · {new Date(app.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <ArrowRight className="size-3 text-white/30 opacity-0 transition-opacity group-hover:opacity-100" />
+                  </button>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center gap-2 py-4 text-center">
+                  <div className="flex size-8 items-center justify-center rounded-full bg-white/10">
+                    <Briefcase className="size-3.5 text-white/30" />
+                  </div>
+                  <p className="text-[10px] text-white/40">No applications yet</p>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
