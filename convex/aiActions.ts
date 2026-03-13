@@ -3,7 +3,8 @@
 import { v } from "convex/values"
 import { action } from "./_generated/server"
 import { api } from "./_generated/api"
-import OpenAI from "openai"
+import { openai } from "@ai-sdk/openai"
+import { generateText } from "ai"
 import { buildTailoringPrompt, buildOptimizationPrompt } from "../lib/prompts"
 
 export const tailorResume = action({
@@ -16,8 +17,6 @@ export const tailorResume = action({
   },
   handler: async (ctx, args): Promise<Record<string, unknown>> => {
     try {
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
       // Step 1: Tailor resume + generate cover letter
       const tailoringPrompt = buildTailoringPrompt(
         JSON.stringify(args.resumeData, null, 2),
@@ -26,23 +25,15 @@ export const tailorResume = action({
         args.jobDescription,
       )
 
-      const tailoringCompletion = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert career consultant. Return only valid JSON matching the requested structure.",
-          },
-          { role: "user", content: tailoringPrompt },
-        ],
+      const { text: tailoringText } = await generateText({
+        model: openai("gpt-4o"),
+        system: "You are an expert career consultant. Return only valid JSON matching the requested structure.",
+        prompt: tailoringPrompt,
         temperature: 0.3,
-        response_format: { type: "json_object" },
+        providerOptions: { openai: { response_format: { type: "json_object" } } },
       })
 
-      const tailoringResult = JSON.parse(
-        tailoringCompletion.choices[0].message.content ?? "{}",
-      )
+      const tailoringResult = JSON.parse(tailoringText)
 
       // Step 2: Generate optimization analysis (non-blocking for the main result)
       let optimizationAnalysis = null
@@ -52,23 +43,15 @@ export const tailorResume = action({
           args.jobDescription,
         )
 
-        const optimizationCompletion = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a resume optimization analyst. Return only valid JSON.",
-            },
-            { role: "user", content: optimizationPrompt },
-          ],
+        const { text: optimizationText } = await generateText({
+          model: openai("gpt-4o-mini"),
+          system: "You are a resume optimization analyst. Return only valid JSON.",
+          prompt: optimizationPrompt,
           temperature: 0.1,
-          response_format: { type: "json_object" },
+          providerOptions: { openai: { response_format: { type: "json_object" } } },
         })
 
-        optimizationAnalysis = JSON.parse(
-          optimizationCompletion.choices[0].message.content ?? "null",
-        )
+        optimizationAnalysis = JSON.parse(optimizationText)
       } catch {
         // Optimization analysis is optional — don't fail the whole operation
       }

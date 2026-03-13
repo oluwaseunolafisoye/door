@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import { ConvexHttpClient } from "convex/browser"
 import { api } from "@/convex/_generated/api"
-import OpenAI from "openai"
+import { openai } from "@ai-sdk/openai"
+import { generateText } from "ai"
 import { buildCVParsingPrompt } from "@/lib/prompts"
 
 export const dynamic = "force-dynamic"
@@ -54,24 +55,15 @@ export async function POST(request: Request) {
       )
     }
 
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "You are a precise resume parser. Return only valid JSON.",
-        },
-        { role: "user", content: buildCVParsingPrompt(rawText) },
-      ],
+    const { text } = await generateText({
+      model: openai("gpt-4o"),
+      system: "You are a precise resume parser. Return only valid JSON.",
+      prompt: buildCVParsingPrompt(rawText),
       temperature: 0.1,
-      response_format: { type: "json_object" },
+      providerOptions: { openai: { response_format: { type: "json_object" } } },
     })
 
-    const parsedData = JSON.parse(
-      completion.choices[0].message.content ?? "{}",
-    )
+    const parsedData = JSON.parse(text)
 
     const convex = getConvex()
     const cvId = await convex.mutation(api.cvs.create, {
