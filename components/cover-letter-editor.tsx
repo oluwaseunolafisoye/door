@@ -40,7 +40,7 @@ export function CoverLetterEditor({ data, onChange }: CoverLetterEditorProps) {
     <div className="space-y-5">
       <h3 className="text-sm font-semibold tracking-tight">Cover Letter</h3>
 
-      <div className="space-y-3 rounded-lg border bg-card p-4">
+      <div className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-4">
         <h4 className="text-xs font-medium text-muted-foreground">
           Your Address
         </h4>
@@ -52,7 +52,7 @@ export function CoverLetterEditor({ data, onChange }: CoverLetterEditorProps) {
         />
       </div>
 
-      <div className="space-y-4 rounded-lg border bg-card p-4">
+      <div className="space-y-4 rounded-lg border border-white/10 bg-white/5 p-4">
         <h4 className="text-xs font-medium text-muted-foreground">Recipient</h4>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1">

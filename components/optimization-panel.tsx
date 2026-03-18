@@ -31,16 +31,16 @@ export function OptimizationPanel({ analysis }: OptimizationPanelProps) {
   const missingKeywords = keywords.filter((k) => !k.found)
 
   return (
-    <div className="rounded-2xl border bg-card">
+    <div className="rounded-2xl border border-white/10 bg-white/5">
       {/* Summary banner — always visible */}
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-muted/50"
+        className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-white/5"
       >
         <div className="flex items-center gap-3">
-          <div className="flex size-8 items-center justify-center rounded-full bg-chart-1/10">
-            <Sparkles className="size-4 text-chart-1" />
+          <div className="flex size-8 items-center justify-center rounded-full bg-[#a4f5a6]/10">
+            <Sparkles className="size-4 text-[#a4f5a6]" />
           </div>
           <div className="space-y-0.5">
             <p className="text-xs font-semibold">Optimization Analysis</p>
@@ -64,7 +64,7 @@ export function OptimizationPanel({ analysis }: OptimizationPanelProps) {
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-2 sm:flex">
             <div className="w-20">
-              <Progress value={keywordPercent}>{null}</Progress>
+              <Progress value={keywordPercent} className="**:data-[slot=progress-indicator]:bg-[#a4f5a6]">{null}</Progress>
             </div>
             <span className="text-[11px] font-medium text-muted-foreground">
               {keywordPercent}%
@@ -90,8 +90,8 @@ export function OptimizationPanel({ analysis }: OptimizationPanelProps) {
               {matchedKeywords.map((kw) => (
                 <Badge
                   key={kw.keyword}
-                  variant="default"
-                  className="text-[10px]"
+                  variant="secondary"
+                  className="text-[10px] bg-[#a4f5a6]/15 text-[#a4f5a6]"
                 >
                   <CheckCircle2 className="mr-0.5 size-2.5" />
                   {kw.keyword}
@@ -123,7 +123,7 @@ export function OptimizationPanel({ analysis }: OptimizationPanelProps) {
                   key={req}
                   className="flex items-center gap-2 text-[11px]"
                 >
-                  <CheckCircle2 className="size-3 shrink-0 text-chart-1" />
+                  <CheckCircle2 className="size-3 shrink-0 text-[#a4f5a6]" />
                   <span>{req}</span>
                 </div>
               ))}

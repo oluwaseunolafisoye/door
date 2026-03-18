@@ -3,14 +3,16 @@ import { v } from "convex/values"
 
 export default defineSchema({
   cvs: defineTable({
+    userId: v.optional(v.string()),
     originalText: v.string(),
     fileName: v.string(),
     fileType: v.string(),
     parsedData: v.any(),
     uploadedAt: v.number(),
     storageId: v.id("_storage"),
-  }),
+  }).index("by_userId", ["userId"]),
   applications: defineTable({
+    userId: v.optional(v.string()),
     cvId: v.id("cvs"),
     jobTitle: v.string(),
     company: v.string(),
@@ -24,5 +26,5 @@ export default defineSchema({
       v.literal("completed"),
       v.literal("failed"),
     ),
-  }),
+  }).index("by_userId", ["userId"]),
 })

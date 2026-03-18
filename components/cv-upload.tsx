@@ -126,7 +126,7 @@ export function CVUpload({ onUploadComplete }: CVUploadProps) {
       onDragLeave={() => setIsDragging(false)}
       onDrop={handleDrop}
       className={cn(
-        "relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 transition-all duration-300",
+        "relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all duration-300 sm:p-12",
         isDragging
           ? "border-chart-1 bg-chart-1/5 scale-[1.02]"
           : "border-border hover:border-muted-foreground/40",
@@ -146,7 +146,7 @@ export function CVUpload({ onUploadComplete }: CVUploadProps) {
                   : "Done!"}
             </p>
           </div>
-          <Progress value={uploadProgress} className="h-1 w-48" />
+          <Progress value={uploadProgress} className="h-1 w-full max-w-48" />
         </div>
       ) : (
         <label className="flex cursor-pointer flex-col items-center gap-4 text-center">

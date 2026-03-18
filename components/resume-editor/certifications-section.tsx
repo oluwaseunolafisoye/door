@@ -40,7 +40,7 @@ export function CertificationsSection({
       </div>
 
       {data.map((item, idx) => (
-        <div key={item.id} className="flex items-end gap-3 rounded-lg border bg-card p-4">
+        <div key={item.id} className="flex items-end gap-3 rounded-lg border border-white/10 bg-white/5 p-4">
           <div className="grid flex-1 gap-3 sm:grid-cols-3">
             <div className="space-y-1">
               <label className="text-xs text-muted-foreground">

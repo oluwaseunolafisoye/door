@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server"
-import { ConvexHttpClient } from "convex/browser"
 import { api } from "@/convex/_generated/api"
 import { openai } from "@ai-sdk/openai"
 import { generateText } from "ai"
 import { buildCVParsingPrompt } from "@/lib/prompts"
+import { fetchAuthMutation, isAuthenticated } from "@/lib/auth-server"
 
 export const dynamic = "force-dynamic"
 
-function getConvex() {
-  return new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
-}
-
 export async function POST(request: Request) {
   try {
+    const hasToken = await isAuthenticated()
+    if (!hasToken) {
+      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 })
+    }
+
     const formData = await request.formData()
     const file = formData.get("file") as File | null
     const storageId = formData.get("storageId") as string | null
@@ -65,8 +66,7 @@ export async function POST(request: Request) {
 
     const parsedData = JSON.parse(text)
 
-    const convex = getConvex()
-    const cvId = await convex.mutation(api.cvs.create, {
+    const cvId = await fetchAuthMutation(api.cvs.create, {
       fileName,
       fileType: file.type || "application/octet-stream",
       storageId: storageId as any,

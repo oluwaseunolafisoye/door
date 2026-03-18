@@ -100,7 +100,7 @@ export function ExperienceSection({
       </div>
 
       {data.map((item, itemIdx) => (
-        <div key={item.id} className="space-y-3 rounded-lg border bg-card p-4">
+        <div key={item.id} className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
               <GripVertical className="size-3.5 text-muted-foreground" />
@@ -220,9 +220,9 @@ export function ExperienceSection({
                     </Button>
                   </div>
                   {mapping && (
-                    <div className="ml-5 space-y-1.5 rounded-md bg-muted/50 px-3 py-2">
+                    <div className="ml-5 space-y-1.5 rounded-md bg-white/5 px-3 py-2">
                       <div className="flex items-start gap-1.5">
-                        <ArrowRight className="mt-0.5 size-3 shrink-0 text-chart-1" />
+                        <ArrowRight className="mt-0.5 size-3 shrink-0 text-[#a4f5a6]" />
                         <p className="text-[11px] leading-relaxed text-muted-foreground">
                           <span className="font-medium text-foreground">
                             {mapping.requirementMatched}

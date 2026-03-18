@@ -53,7 +53,7 @@ export function EducationSection({ data, onChange }: EducationSectionProps) {
       </div>
 
       {data.map((item, idx) => (
-        <div key={item.id} className="space-y-3 rounded-lg border bg-card p-4">
+        <div key={item.id} className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
               {item.institution || `Education ${idx + 1}`}

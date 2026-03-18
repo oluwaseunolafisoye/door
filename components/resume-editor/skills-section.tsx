@@ -64,7 +64,7 @@ export function SkillsSection({ data, onChange }: SkillsSectionProps) {
       </div>
 
       {data.map((cat, catIdx) => (
-        <div key={cat.id} className="space-y-3 rounded-lg border bg-card p-4">
+        <div key={cat.id} className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-4">
           <div className="flex items-center gap-2">
             <Input
               value={cat.category}

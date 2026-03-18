@@ -54,6 +54,21 @@ export interface CertificationItem {
   date: string
 }
 
+export type SectionId =
+  | "experience"
+  | "education"
+  | "skills"
+  | "projects"
+  | "certifications"
+
+export const DEFAULT_SECTION_ORDER: SectionId[] = [
+  "experience",
+  "education",
+  "skills",
+  "projects",
+  "certifications",
+]
+
 export interface ResumeData {
   profile: ProfileData
   experience: ExperienceItem[]
@@ -61,6 +76,7 @@ export interface ResumeData {
   skills: SkillCategory[]
   projects: ProjectItem[]
   certifications: CertificationItem[]
+  sectionOrder?: SectionId[]
 }
 
 export interface CoverLetterData {

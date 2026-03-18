@@ -9,7 +9,8 @@ import {
   Font,
   Link,
 } from "@react-pdf/renderer"
-import type { ResumeData } from "@/lib/types"
+import type { ResumeData, SectionId } from "@/lib/types"
+import { DEFAULT_SECTION_ORDER } from "@/lib/types"
 
 Font.register({
   family: "Inter",
@@ -198,10 +199,20 @@ const s = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 2,
   },
+  projNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
   projName: {
     fontWeight: 700,
     fontSize: 10,
     color: "#111111",
+  },
+  projUrl: {
+    fontSize: 8.5,
+    color: "#2563eb",
+    textDecoration: "none",
   },
   projTech: {
     fontSize: 8.5,
@@ -245,6 +256,139 @@ interface ResumeTemplateProps {
 export function ResumeTemplate({ data }: ResumeTemplateProps) {
   const { profile, experience, education, skills, projects, certifications } =
     data
+  const order = data.sectionOrder ?? DEFAULT_SECTION_ORDER
+
+  const renderSection = (id: SectionId) => {
+    switch (id) {
+      case "skills":
+        return skills.length > 0 ? (
+          <View key={id}>
+            <SectionHeader title="Skills" />
+            {skills.map((cat) => (
+              <View key={cat.id} style={s.skillRow}>
+                <Text style={s.skillCategory}>{cat.category}:</Text>
+                <Text style={s.skillItems}>{cat.items.join(", ")}</Text>
+              </View>
+            ))}
+          </View>
+        ) : null
+      case "experience":
+        return experience.length > 0 ? (
+          <View key={id}>
+            <SectionHeader title="Work Experience" />
+            {experience.map((exp) => (
+              <View key={exp.id} style={s.expItem}>
+                <View wrap={false}>
+                  <Text style={s.expCompany}>{exp.company}</Text>
+                  <View style={s.expTitleRow}>
+                    <Text style={s.expTitle}>
+                      {exp.title}
+                      {exp.location ? `, ${exp.location}` : ""}
+                    </Text>
+                    <Text style={s.expDates}>
+                      {exp.startDate} - {exp.current ? "Present" : exp.endDate}
+                    </Text>
+                  </View>
+                  {exp.bullets[0] && (
+                    <View style={s.bullet}>
+                      <Text style={s.bulletDot}>•</Text>
+                      <Text style={s.bulletText}>{exp.bullets[0]}</Text>
+                    </View>
+                  )}
+                </View>
+                {exp.bullets.slice(1).map(
+                  (bullet, i) =>
+                    bullet && (
+                      <View key={i} style={s.bullet}>
+                        <Text style={s.bulletDot}>•</Text>
+                        <Text style={s.bulletText}>{bullet}</Text>
+                      </View>
+                    ),
+                )}
+              </View>
+            ))}
+          </View>
+        ) : null
+      case "education":
+        return education.length > 0 ? (
+          <View key={id}>
+            <SectionHeader title="Education" />
+            {education.map((edu) => (
+              <View key={edu.id} style={s.eduItem}>
+                <View style={s.eduTopRow}>
+                  <Text style={s.eduSchool}>{edu.institution}</Text>
+                  <Text style={s.expDates}>
+                    {edu.startDate} — {edu.endDate}
+                  </Text>
+                </View>
+                <Text style={s.eduDegree}>
+                  {edu.degree}
+                  {edu.field ? ` in ${edu.field}` : ""}
+                  {edu.gpa ? ` — GPA: ${edu.gpa}` : ""}
+                  {edu.honors ? ` — ${edu.honors}` : ""}
+                </Text>
+                {edu.description && (
+                  <Text style={s.summaryText}>{edu.description}</Text>
+                )}
+              </View>
+            ))}
+          </View>
+        ) : null
+      case "projects":
+        return projects.length > 0 ? (
+          <View key={id}>
+            <SectionHeader title="Projects" />
+            {projects.map((proj) => (
+              <View key={proj.id} style={s.projItem}>
+                <View style={s.projTopRow}>
+                  <View style={s.projNameRow}>
+                    <Text style={s.projName}>{proj.name}</Text>
+                    {proj.url && (
+                      <Link
+                        src={proj.url.startsWith("http") ? proj.url : `https://${proj.url}`}
+                        style={s.projUrl}
+                      >
+                        {proj.url.replace(/^https?:\/\//, "")}
+                      </Link>
+                    )}
+                  </View>
+                  {proj.technologies && (
+                    <Text style={s.projTech}>{proj.technologies}</Text>
+                  )}
+                </View>
+                {proj.description && (
+                  <Text style={s.projDesc}>{proj.description}</Text>
+                )}
+                {proj.bullets.map(
+                  (bullet, i) =>
+                    bullet && (
+                      <View key={i} style={s.bullet}>
+                        <Text style={s.bulletDot}>•</Text>
+                        <Text style={s.bulletText}>{bullet}</Text>
+                      </View>
+                    ),
+                )}
+              </View>
+            ))}
+          </View>
+        ) : null
+      case "certifications":
+        return certifications.length > 0 ? (
+          <View key={id}>
+            <SectionHeader title="Certifications" />
+            {certifications.map((cert) => (
+              <View key={cert.id} style={s.certItem}>
+                <View>
+                  <Text style={s.certName}>{cert.name}</Text>
+                  <Text style={s.certIssuer}>{cert.issuer}</Text>
+                </View>
+                <Text style={s.expDates}>{cert.date}</Text>
+              </View>
+            ))}
+          </View>
+        ) : null
+    }
+  }
 
   return (
     <Document>
@@ -294,127 +438,8 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
           </View>
         )}
 
-        {/* Skills */}
-        {skills.length > 0 && (
-          <View>
-            <SectionHeader title="Skills" />
-            {skills.map((cat) => (
-              <View key={cat.id} style={s.skillRow}>
-                <Text style={s.skillCategory}>{cat.category}:</Text>
-                <Text style={s.skillItems}>{cat.items.join(", ")}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Experience */}
-        {experience.length > 0 && (
-          <View>
-            <SectionHeader title="Work Experience" />
-            {experience.map((exp) => (
-              <View key={exp.id} style={s.expItem}>
-                <View wrap={false}>
-                  <Text style={s.expCompany}>{exp.company}</Text>
-                  <View style={s.expTitleRow}>
-                    <Text style={s.expTitle}>
-                      {exp.title}
-                      {exp.location ? `, ${exp.location}` : ""}
-                    </Text>
-                    <Text style={s.expDates}>
-                      {exp.startDate} - {exp.current ? "Present" : exp.endDate}
-                    </Text>
-                  </View>
-                  {exp.bullets[0] && (
-                    <View style={s.bullet}>
-                      <Text style={s.bulletDot}>•</Text>
-                      <Text style={s.bulletText}>{exp.bullets[0]}</Text>
-                    </View>
-                  )}
-                </View>
-                {exp.bullets.slice(1).map(
-                  (bullet, i) =>
-                    bullet && (
-                      <View key={i} style={s.bullet}>
-                        <Text style={s.bulletDot}>•</Text>
-                        <Text style={s.bulletText}>{bullet}</Text>
-                      </View>
-                    ),
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Education */}
-        {education.length > 0 && (
-          <View>
-            <SectionHeader title="Education" />
-            {education.map((edu) => (
-              <View key={edu.id} style={s.eduItem}>
-                <View style={s.eduTopRow}>
-                  <Text style={s.eduSchool}>{edu.institution}</Text>
-                  <Text style={s.expDates}>
-                    {edu.startDate} — {edu.endDate}
-                  </Text>
-                </View>
-                <Text style={s.eduDegree}>
-                  {edu.degree}
-                  {edu.field ? ` in ${edu.field}` : ""}
-                  {edu.gpa ? ` — GPA: ${edu.gpa}` : ""}
-                  {edu.honors ? ` — ${edu.honors}` : ""}
-                </Text>
-                {edu.description && (
-                  <Text style={s.summaryText}>{edu.description}</Text>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Projects */}
-        {projects.length > 0 && (
-          <View>
-            <SectionHeader title="Projects" />
-            {projects.map((proj) => (
-              <View key={proj.id} style={s.projItem}>
-                <View style={s.projTopRow}>
-                  <Text style={s.projName}>{proj.name}</Text>
-                  {proj.technologies && (
-                    <Text style={s.projTech}>{proj.technologies}</Text>
-                  )}
-                </View>
-                {proj.description && (
-                  <Text style={s.projDesc}>{proj.description}</Text>
-                )}
-                {proj.bullets.map(
-                  (bullet, i) =>
-                    bullet && (
-                      <View key={i} style={s.bullet}>
-                        <Text style={s.bulletDot}>•</Text>
-                        <Text style={s.bulletText}>{bullet}</Text>
-                      </View>
-                    ),
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Certifications */}
-        {certifications.length > 0 && (
-          <View>
-            <SectionHeader title="Certifications" />
-            {certifications.map((cert) => (
-              <View key={cert.id} style={s.certItem}>
-                <View>
-                  <Text style={s.certName}>{cert.name}</Text>
-                  <Text style={s.certIssuer}>{cert.issuer}</Text>
-                </View>
-                <Text style={s.expDates}>{cert.date}</Text>
-              </View>
-            ))}
-          </View>
-        )}
+        {/* Dynamic sections in user-defined order */}
+        {order.map(renderSection)}
       </Page>
     </Document>
   )

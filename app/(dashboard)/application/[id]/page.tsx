@@ -4,8 +4,8 @@ import { use, useState, useCallback, useMemo } from "react"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import type { Id } from "@/convex/_generated/dataModel"
-import type { ResumeData, CoverLetterData, OptimizationAnalysis } from "@/lib/types"
-import { DEFAULT_RESUME_DATA, DEFAULT_COVER_LETTER_DATA } from "@/lib/types"
+import type { ResumeData, CoverLetterData, OptimizationAnalysis, SectionId } from "@/lib/types"
+import { DEFAULT_RESUME_DATA, DEFAULT_COVER_LETTER_DATA, DEFAULT_SECTION_ORDER } from "@/lib/types"
 import dynamic from "next/dynamic"
 
 import { ProfileSection } from "@/components/resume-editor/profile-section"
@@ -35,6 +35,8 @@ import {
   FileText,
   Mail,
   XCircle,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -55,11 +57,14 @@ export default function ApplicationPage({
     useState<CoverLetterData | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [activeTab, setActiveTab] = useState("resume")
+  const [sectionOrder, setSectionOrder] = useState<SectionId[]>(DEFAULT_SECTION_ORDER)
   const [initialized, setInitialized] = useState(false)
 
   // Initialize state from Convex data once completed
   if (application && application.customizedResume && !initialized) {
-    setResumeData(application.customizedResume as ResumeData)
+    const resume = application.customizedResume as ResumeData
+    setResumeData(resume)
+    setSectionOrder(resume.sectionOrder ?? DEFAULT_SECTION_ORDER)
     setCoverLetterData(
       (application.coverLetter as CoverLetterData) ?? DEFAULT_COVER_LETTER_DATA
     )
@@ -70,6 +75,29 @@ export default function ApplicationPage({
     () => application?.optimizationAnalysis as OptimizationAnalysis | undefined,
     [application?.optimizationAnalysis]
   )
+
+  const moveSection = useCallback(
+    (index: number, direction: "up" | "down") => {
+      const newOrder = [...sectionOrder]
+      const target = direction === "up" ? index - 1 : index + 1
+      if (target < 0 || target >= newOrder.length) return
+      ;[newOrder[index], newOrder[target]] = [newOrder[target], newOrder[index]]
+      setSectionOrder(newOrder)
+      setResumeData((prev) => ({
+        ...(prev ?? DEFAULT_RESUME_DATA),
+        sectionOrder: newOrder,
+      }))
+    },
+    [sectionOrder],
+  )
+
+  const sectionLabels: Record<SectionId, string> = {
+    experience: "Experience",
+    education: "Education",
+    skills: "Skills",
+    projects: "Projects",
+    certifications: "Certifications",
+  }
 
   const handleSave = useCallback(async () => {
     if (!resumeData || !coverLetterData) return
@@ -108,7 +136,7 @@ export default function ApplicationPage({
       <div className={shell} style={dotGrid}>
         <div className="space-y-4 p-8">
           <Skeleton className="h-8 w-64 opacity-20" />
-          <div className="grid h-[80vh] grid-cols-2 gap-6">
+          <div className="grid h-[80vh] grid-cols-1 gap-6 lg:grid-cols-2">
             <Skeleton className="rounded-2xl opacity-20" />
             <Skeleton className="rounded-2xl opacity-20" />
           </div>
@@ -196,7 +224,7 @@ export default function ApplicationPage({
   return (
     <div className={shell} style={dotGrid}>
       {/* Top bar */}
-      <div className="flex items-center justify-between border-b border-white/8 px-6 py-3">
+      <div className="flex items-center justify-between border-b border-white/8 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
           <Link href="/">
             <Button variant="ghost" size="icon" className="text-white/50 hover:bg-white/10 hover:text-white">
@@ -210,7 +238,7 @@ export default function ApplicationPage({
         </div>
 
         {/* Toolbar */}
-        <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-sm">
+        <div className="flex items-center gap-1.5 rounded-2xl border border-white/10 bg-white/5 px-2 py-1.5 backdrop-blur-sm sm:gap-2 sm:px-3">
           <Button
             variant="ghost"
             size="sm"
@@ -240,7 +268,7 @@ export default function ApplicationPage({
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-2">
         {/* Left: editor */}
         <div className="overflow-y-auto border-r border-white/8">
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-6 border border-white/10 bg-white/5">
                 <TabsTrigger value="resume" className="gap-1.5 text-xs data-[state=active]:bg-[#a4f5a6] data-[state=active]:text-[#0c1a1a]">
@@ -266,57 +294,106 @@ export default function ApplicationPage({
                     }))
                   }
                 />
-                <Separator className="bg-white/8" />
-                <ExperienceSection
-                  data={currentResumeData.experience}
-                  onChange={(experience) =>
-                    setResumeData((prev) => ({
-                      ...(prev ?? DEFAULT_RESUME_DATA),
-                      experience,
-                    }))
-                  }
-                  optimizations={optimizationAnalysis?.experienceOptimizations}
-                />
-                <Separator className="bg-white/8" />
-                <EducationSection
-                  data={currentResumeData.education}
-                  onChange={(education) =>
-                    setResumeData((prev) => ({
-                      ...(prev ?? DEFAULT_RESUME_DATA),
-                      education,
-                    }))
-                  }
-                />
-                <Separator className="bg-white/8" />
-                <SkillsSection
-                  data={currentResumeData.skills}
-                  onChange={(skills) =>
-                    setResumeData((prev) => ({
-                      ...(prev ?? DEFAULT_RESUME_DATA),
-                      skills,
-                    }))
-                  }
-                />
-                <Separator className="bg-white/8" />
-                <ProjectsSection
-                  data={currentResumeData.projects}
-                  onChange={(projects) =>
-                    setResumeData((prev) => ({
-                      ...(prev ?? DEFAULT_RESUME_DATA),
-                      projects,
-                    }))
-                  }
-                />
-                <Separator className="bg-white/8" />
-                <CertificationsSection
-                  data={currentResumeData.certifications}
-                  onChange={(certifications) =>
-                    setResumeData((prev) => ({
-                      ...(prev ?? DEFAULT_RESUME_DATA),
-                      certifications,
-                    }))
-                  }
-                />
+                {sectionOrder.map((sectionId, index) => {
+                  const isFirst = index === 0
+                  const isLast = index === sectionOrder.length - 1
+
+                  const sectionContent = (() => {
+                    switch (sectionId) {
+                      case "experience":
+                        return (
+                          <ExperienceSection
+                            data={currentResumeData.experience}
+                            onChange={(experience) =>
+                              setResumeData((prev) => ({
+                                ...(prev ?? DEFAULT_RESUME_DATA),
+                                experience,
+                              }))
+                            }
+                            optimizations={optimizationAnalysis?.experienceOptimizations}
+                          />
+                        )
+                      case "education":
+                        return (
+                          <EducationSection
+                            data={currentResumeData.education}
+                            onChange={(education) =>
+                              setResumeData((prev) => ({
+                                ...(prev ?? DEFAULT_RESUME_DATA),
+                                education,
+                              }))
+                            }
+                          />
+                        )
+                      case "skills":
+                        return (
+                          <SkillsSection
+                            data={currentResumeData.skills}
+                            onChange={(skills) =>
+                              setResumeData((prev) => ({
+                                ...(prev ?? DEFAULT_RESUME_DATA),
+                                skills,
+                              }))
+                            }
+                          />
+                        )
+                      case "projects":
+                        return (
+                          <ProjectsSection
+                            data={currentResumeData.projects}
+                            onChange={(projects) =>
+                              setResumeData((prev) => ({
+                                ...(prev ?? DEFAULT_RESUME_DATA),
+                                projects,
+                              }))
+                            }
+                          />
+                        )
+                      case "certifications":
+                        return (
+                          <CertificationsSection
+                            data={currentResumeData.certifications}
+                            onChange={(certifications) =>
+                              setResumeData((prev) => ({
+                                ...(prev ?? DEFAULT_RESUME_DATA),
+                                certifications,
+                              }))
+                            }
+                          />
+                        )
+                    }
+                  })()
+
+                  return (
+                    <div key={sectionId}>
+                      <Separator className="bg-white/8" />
+                      <div className="flex items-center justify-between pt-4 pb-2">
+                        <span className="text-[10px] font-medium uppercase tracking-widest text-white/30">
+                          {sectionLabels[sectionId]}
+                        </span>
+                        <div className="flex items-center gap-0.5">
+                          <button
+                            type="button"
+                            disabled={isFirst}
+                            onClick={() => moveSection(index, "up")}
+                            className="rounded p-1 text-white/30 transition-colors hover:bg-white/10 hover:text-white/60 disabled:opacity-20 disabled:hover:bg-transparent"
+                          >
+                            <ChevronUp className="size-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={isLast}
+                            onClick={() => moveSection(index, "down")}
+                            className="rounded p-1 text-white/30 transition-colors hover:bg-white/10 hover:text-white/60 disabled:opacity-20 disabled:hover:bg-transparent"
+                          >
+                            <ChevronDown className="size-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                      {sectionContent}
+                    </div>
+                  )
+                })}
               </TabsContent>
 
               <TabsContent value="coverLetter">

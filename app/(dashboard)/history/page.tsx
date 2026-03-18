@@ -38,7 +38,7 @@ export default function HistoryPage() {
   return (
     <div className="space-y-8">
       <div className="space-y-1">
-        <h1 className="text-3xl font-semibold tracking-tight text-white">History</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">History</h1>
         <p className="text-sm text-white/50">
           All your tailored applications in one place.
         </p>

@@ -9,8 +9,11 @@ export const create = mutation({
     jobDescription: v.string(),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error("Unauthenticated")
     return await ctx.db.insert("applications", {
       ...args,
+      userId: identity.subject,
       createdAt: Date.now(),
       status: "processing",
     })
@@ -68,16 +71,25 @@ export const get = query({
 
 export const list = query({
   handler: async (ctx) => {
-    return await ctx.db.query("applications").order("desc").collect()
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) return []
+    return await ctx.db
+      .query("applications")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .order("desc")
+      .collect()
   },
 })
 
 export const listRecent = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) return []
     const limit = args.limit ?? 5
     return await ctx.db
       .query("applications")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
       .order("desc")
       .take(limit)
   },
@@ -86,13 +98,20 @@ export const listRecent = query({
 export const remove = mutation({
   args: { id: v.id("applications") },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error("Unauthenticated")
     await ctx.db.delete(args.id)
   },
 })
 
 export const count = query({
   handler: async (ctx) => {
-    const all = await ctx.db.query("applications").collect()
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) return { total: 0, thisWeek: 0 }
+    const all = await ctx.db
+      .query("applications")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .collect()
     const now = Date.now()
     const weekAgo = now - 7 * 24 * 60 * 60 * 1000
     const thisWeek = all.filter((a) => a.createdAt > weekAgo)
@@ -102,7 +121,26 @@ export const count = query({
 
 export const aggregateStats = query({
   handler: async (ctx) => {
-    const all = await ctx.db.query("applications").collect()
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity)
+      return {
+        total: 0,
+        thisWeek: 0,
+        completed: 0,
+        completedThisWeek: 0,
+        avgKeywordPercent: 0,
+        avgRequirementPercent: 0,
+        totalBulletsOptimized: 0,
+        totalKeywordsMatched: 0,
+        totalKeywords: 0,
+        appsWithAnalysis: 0,
+        topSkills: [],
+      }
+
+    const all = await ctx.db
+      .query("applications")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .collect()
     const completed = all.filter((a) => a.status === "completed")
 
     let totalKeywordsMatched = 0

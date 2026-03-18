@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import type { ProjectItem } from "@/lib/types"
-import { Plus, Trash2, ChevronUp, ChevronDown } from "lucide-react"
+import { Plus, Trash2, ChevronUp, ChevronDown, ExternalLink } from "lucide-react"
 
 interface ProjectsSectionProps {
   data: ProjectItem[]
@@ -73,7 +73,7 @@ export function ProjectsSection({ data, onChange }: ProjectsSectionProps) {
       </div>
 
       {data.map((item, idx) => (
-        <div key={item.id} className="space-y-3 rounded-lg border bg-card p-4">
+        <div key={item.id} className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
               {item.name || `Project ${idx + 1}`}
@@ -106,18 +106,41 @@ export function ProjectsSection({ data, onChange }: ProjectsSectionProps) {
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">
-                Project Name
-              </label>
-              <Input
-                value={item.name}
-                onChange={(e) => updateItem(idx, { name: e.target.value })}
-                placeholder="My Project"
-              />
+          {/* Row 1: Name + URL link | Technologies */}
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-1 items-end gap-2">
+              <div className="flex-1 space-y-1">
+                <label className="text-xs text-muted-foreground">
+                  Project Name
+                </label>
+                <Input
+                  value={item.name}
+                  onChange={(e) => updateItem(idx, { name: e.target.value })}
+                  placeholder="My Project"
+                />
+              </div>
+              <div className="flex-1 space-y-1">
+                <label className="text-xs text-muted-foreground">URL</label>
+                <div className="flex items-center gap-1.5">
+                  <Input
+                    value={item.url ?? ""}
+                    onChange={(e) => updateItem(idx, { url: e.target.value })}
+                    placeholder="https://..."
+                  />
+                  {item.url && (
+                    <a
+                      href={item.url.startsWith("http") ? item.url : `https://${item.url}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 rounded p-1.5 text-white/30 transition-colors hover:bg-white/10 hover:text-[#a4f5a6]"
+                    >
+                      <ExternalLink className="size-3.5" />
+                    </a>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 sm:w-44">
               <label className="text-xs text-muted-foreground">
                 Technologies
               </label>
@@ -126,29 +149,24 @@ export function ProjectsSection({ data, onChange }: ProjectsSectionProps) {
                 onChange={(e) =>
                   updateItem(idx, { technologies: e.target.value })
                 }
-                placeholder="React, Node.js, PostgreSQL"
+                placeholder="React, Node.js"
               />
             </div>
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">URL</label>
-              <Input
-                value={item.url ?? ""}
-                onChange={(e) => updateItem(idx, { url: e.target.value })}
-                placeholder="https://..."
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">
-                Description
-              </label>
-              <Input
-                value={item.description}
-                onChange={(e) =>
-                  updateItem(idx, { description: e.target.value })
-                }
-                placeholder="Brief description"
-              />
-            </div>
+          </div>
+
+          {/* Row 2: Description */}
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground">
+              Description
+            </label>
+            <Textarea
+              value={item.description}
+              onChange={(e) =>
+                updateItem(idx, { description: e.target.value })
+              }
+              placeholder="Brief description of the project..."
+              className="min-h-16 resize-y text-sm"
+            />
           </div>
 
           <div className="space-y-2">
