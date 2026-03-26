@@ -68,7 +68,15 @@ export function ProfileSection({ data, onChange }: ProfileSectionProps) {
             placeholder="linkedin.com/in/johndoe"
           />
         </div>
-        <div className="col-span-full space-y-1">
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">GitHub</label>
+          <Input
+            value={data.github}
+            onChange={(e) => update("github", e.target.value)}
+            placeholder="github.com/johndoe"
+          />
+        </div>
+        <div className="space-y-1">
           <label className="text-xs text-muted-foreground">Website</label>
           <Input
             value={data.website}

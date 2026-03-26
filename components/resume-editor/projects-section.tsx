@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import type { ProjectItem } from "@/lib/types"
-import { Plus, Trash2, ChevronUp, ChevronDown, ExternalLink } from "lucide-react"
+import { Plus, Trash2, ChevronUp, ChevronDown, ExternalLink, Eye, EyeOff } from "lucide-react"
 
 interface ProjectsSectionProps {
   data: ProjectItem[]
@@ -73,12 +73,21 @@ export function ProjectsSection({ data, onChange }: ProjectsSectionProps) {
       </div>
 
       {data.map((item, idx) => (
-        <div key={item.id} className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-4">
+        <div key={item.id} className={`space-y-3 rounded-lg border border-white/10 bg-white/5 p-4 ${item.hidden ? "opacity-40" : ""}`}>
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">
               {item.name || `Project ${idx + 1}`}
+              {item.hidden && <span className="ml-1.5 text-white/20">(hidden)</span>}
             </span>
             <div className="flex items-center gap-0.5">
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => updateItem(idx, { hidden: !item.hidden })}
+                title={item.hidden ? "Show in PDF" : "Hide from PDF"}
+              >
+                {item.hidden ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+              </Button>
               <Button
                 variant="ghost"
                 size="icon-xs"

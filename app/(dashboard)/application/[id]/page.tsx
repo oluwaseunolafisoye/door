@@ -37,6 +37,8 @@ import {
   XCircle,
   ChevronUp,
   ChevronDown,
+  Eye,
+  EyeOff,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -58,6 +60,7 @@ export default function ApplicationPage({
   const [isSaving, setIsSaving] = useState(false)
   const [activeTab, setActiveTab] = useState("resume")
   const [sectionOrder, setSectionOrder] = useState<SectionId[]>(DEFAULT_SECTION_ORDER)
+  const [hiddenSections, setHiddenSections] = useState<SectionId[]>([])
   const [initialized, setInitialized] = useState(false)
 
   // Initialize state from Convex data once completed
@@ -65,6 +68,7 @@ export default function ApplicationPage({
     const resume = application.customizedResume as ResumeData
     setResumeData(resume)
     setSectionOrder(resume.sectionOrder ?? DEFAULT_SECTION_ORDER)
+    setHiddenSections(resume.hiddenSections ?? [])
     setCoverLetterData(
       (application.coverLetter as CoverLetterData) ?? DEFAULT_COVER_LETTER_DATA
     )
@@ -89,6 +93,20 @@ export default function ApplicationPage({
       }))
     },
     [sectionOrder],
+  )
+
+  const toggleSection = useCallback(
+    (sectionId: SectionId) => {
+      const next = hiddenSections.includes(sectionId)
+        ? hiddenSections.filter((s) => s !== sectionId)
+        : [...hiddenSections, sectionId]
+      setHiddenSections(next)
+      setResumeData((prev) => ({
+        ...(prev ?? DEFAULT_RESUME_DATA),
+        hiddenSections: next,
+      }))
+    },
+    [hiddenSections],
   )
 
   const sectionLabels: Record<SectionId, string> = {
@@ -364,14 +382,25 @@ export default function ApplicationPage({
                     }
                   })()
 
+                  const isHidden = hiddenSections.includes(sectionId)
+
                   return (
-                    <div key={sectionId}>
+                    <div key={sectionId} className={isHidden ? "opacity-40" : ""}>
                       <Separator className="bg-white/8" />
                       <div className="flex items-center justify-between pt-4 pb-2">
                         <span className="text-[10px] font-medium uppercase tracking-widest text-white/30">
                           {sectionLabels[sectionId]}
+                          {isHidden && <span className="ml-2 normal-case tracking-normal text-white/20">(hidden from PDF)</span>}
                         </span>
                         <div className="flex items-center gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => toggleSection(sectionId)}
+                            className={`rounded p-1 transition-colors hover:bg-white/10 ${isHidden ? "text-white/20 hover:text-white/50" : "text-white/30 hover:text-white/60"}`}
+                            title={isHidden ? "Show section" : "Hide section"}
+                          >
+                            {isHidden ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                          </button>
                           <button
                             type="button"
                             disabled={isFirst}

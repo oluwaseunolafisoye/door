@@ -30,90 +30,96 @@ Font.register({
   ],
 })
 
+// Disable automatic hyphenation to prevent mid-word breaks (e.g., "produc tion-ready")
+Font.registerHyphenationCallback((word) => [word])
+
 const s = StyleSheet.create({
   page: {
     fontFamily: "Inter",
     fontSize: 9.5,
-    paddingHorizontal: 44,
-    paddingTop: 16,
-    paddingBottom: 24,
+    paddingHorizontal: 40,
+    paddingTop: 14,
+    paddingBottom: 14,
     color: "#1a1a1a",
-    lineHeight: 1.4,
+    lineHeight: 1.35,
     backgroundColor: "#ffffff",
   },
   // ── Header ────────────────────────────────────────────────
   header: {
-    marginBottom: 8,
-    paddingBottom: 10,
+    marginBottom: 4,
+    paddingBottom: 4,
     borderBottomWidth: 1,
     borderBottomColor: "#d4d4d4",
     flexDirection: "column",
+    alignItems: "center",
   },
   name: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: 700,
-    marginBottom: 2,
+    marginBottom: 1,
     color: "#111111",
     lineHeight: 1.2,
+    textAlign: "center",
   },
   title: {
-    fontSize: 10.5,
+    fontSize: 10,
     color: "#525252",
-    marginBottom: 8,
-    lineHeight: 1.3,
+    marginBottom: 3,
+    lineHeight: 1.2,
+    textAlign: "center",
   },
   contactRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
   },
   contactItem: {
-    fontSize: 8.5,
+    fontSize: 7.5,
     color: "#404040",
   },
   contactLink: {
-    fontSize: 8.5,
+    fontSize: 7.5,
     color: "#404040",
     textDecoration: "none",
   },
+  contactSep: {
+    fontSize: 7.5,
+    color: "#a3a3a3",
+    marginHorizontal: 3,
+  },
   // ── Section header ────────────────────────────────────────
   sectionHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 6,
-    marginBottom: 8,
-    gap: 6,
-  },
-  sectionBar: {
-    width: 28,
-    height: 4,
-    backgroundColor: "#111111",
-    borderRadius: 1,
+    marginTop: 3,
+    marginBottom: 3,
+    paddingBottom: 2,
+    borderBottomWidth: 0.75,
+    borderBottomColor: "#d4d4d4",
   },
   sectionTitle: {
     fontSize: 10,
     fontWeight: 700,
     textTransform: "uppercase" as const,
-    letterSpacing: 1.2,
-    color: "#111111",
+    color: "#000000",
   },
   // ── Summary ───────────────────────────────────────────────
   summaryText: {
     fontSize: 9,
     color: "#404040",
-    lineHeight: 1.55,
+    lineHeight: 1.35,
   },
   // ── Experience ────────────────────────────────────────────
   expItem: {
-    marginBottom: 10,
+    marginBottom: 5,
   },
   expTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 1,
+    marginBottom: 0.5,
   },
-  expCompany: {
+  expTitle: {
     fontWeight: 700,
     fontSize: 10,
     color: "#111111",
@@ -122,13 +128,13 @@ const s = StyleSheet.create({
     fontSize: 8.5,
     color: "#737373",
   },
-  expTitleRow: {
+  expCompanyRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 4,
+    marginBottom: 2,
   },
-  expTitle: {
+  expCompany: {
     fontSize: 9.5,
     color: "#404040",
   },
@@ -138,7 +144,7 @@ const s = StyleSheet.create({
   },
   bullet: {
     flexDirection: "row",
-    marginBottom: 2.5,
+    marginBottom: 1,
     paddingLeft: 6,
   },
   bulletDot: {
@@ -150,18 +156,18 @@ const s = StyleSheet.create({
   bulletText: {
     flex: 1,
     fontSize: 9,
-    lineHeight: 1.5,
+    lineHeight: 1.4,
     color: "#262626",
   },
   // ── Education ─────────────────────────────────────────────
   eduItem: {
-    marginBottom: 7,
+    marginBottom: 2,
   },
   eduTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 1,
+    marginBottom: 0.5,
   },
   eduSchool: {
     fontWeight: 700,
@@ -175,29 +181,30 @@ const s = StyleSheet.create({
   // ── Skills ────────────────────────────────────────────────
   skillRow: {
     flexDirection: "row",
-    marginBottom: 3.5,
+    marginBottom: 1.5,
   },
   skillCategory: {
     fontWeight: 600,
     fontSize: 9,
     color: "#111111",
-    width: 130,
+    maxWidth: 130,
+    marginRight: 8,
     flexShrink: 0,
   },
   skillItems: {
     flex: 1,
     fontSize: 9,
     color: "#404040",
-    lineHeight: 1.5,
+    lineHeight: 1.4,
   },
   // ── Projects ──────────────────────────────────────────────
   projItem: {
-    marginBottom: 9,
+    marginBottom: 3,
   },
   projTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 2,
+    marginBottom: 1,
   },
   projNameRow: {
     flexDirection: "row",
@@ -219,15 +226,21 @@ const s = StyleSheet.create({
     color: "#737373",
   },
   projDesc: {
-    fontSize: 9,
+    fontSize: 8.5,
     color: "#525252",
-    marginBottom: 3,
+    marginBottom: 1,
+  },
+  projBulletText: {
+    flex: 1,
+    fontSize: 8.5,
+    lineHeight: 1.4,
+    color: "#262626",
   },
   // ── Certifications ────────────────────────────────────────
   certItem: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   certName: {
     fontWeight: 600,
@@ -243,7 +256,6 @@ const s = StyleSheet.create({
 function SectionHeader({ title }: { title: string }) {
   return (
     <View style={s.sectionHeaderRow}>
-      <View style={s.sectionBar} />
       <Text style={s.sectionTitle}>{title}</Text>
     </View>
   )
@@ -257,8 +269,13 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
   const { profile, experience, education, skills, projects, certifications } =
     data
   const order = data.sectionOrder ?? DEFAULT_SECTION_ORDER
+  const hidden = new Set(data.hiddenSections ?? [])
+  const visibleExperience = experience.filter((e) => !e.hidden)
+  const visibleEducation = education.filter((e) => !e.hidden)
+  const visibleProjects = projects.filter((p) => !p.hidden)
 
   const renderSection = (id: SectionId) => {
+    if (hidden.has(id)) return null
     switch (id) {
       case "skills":
         return skills.length > 0 ? (
@@ -266,28 +283,32 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
             <SectionHeader title="Skills" />
             {skills.map((cat) => (
               <View key={cat.id} style={s.skillRow}>
-                <Text style={s.skillCategory}>{cat.category}:</Text>
+                {cat.category ? (
+                  <Text style={s.skillCategory}>{cat.category}:</Text>
+                ) : null}
                 <Text style={s.skillItems}>{cat.items.join(", ")}</Text>
               </View>
             ))}
           </View>
         ) : null
       case "experience":
-        return experience.length > 0 ? (
+        return visibleExperience.length > 0 ? (
           <View key={id}>
             <SectionHeader title="Work Experience" />
-            {experience.map((exp) => (
+            {visibleExperience.map((exp) => (
               <View key={exp.id} style={s.expItem}>
                 <View wrap={false}>
-                  <Text style={s.expCompany}>{exp.company}</Text>
-                  <View style={s.expTitleRow}>
-                    <Text style={s.expTitle}>
-                      {exp.title}
-                      {exp.location ? `, ${exp.location}` : ""}
-                    </Text>
+                  <View style={s.expTopRow}>
+                    <Text style={s.expTitle}>{exp.title}</Text>
                     <Text style={s.expDates}>
-                      {exp.startDate} - {exp.current ? "Present" : exp.endDate}
+                      {exp.startDate} – {exp.current ? "Present" : exp.endDate}
                     </Text>
+                  </View>
+                  <View style={s.expCompanyRow}>
+                    <Text style={s.expCompany}>{exp.company}</Text>
+                    {exp.location ? (
+                      <Text style={s.expLocation}>{exp.location}</Text>
+                    ) : null}
                   </View>
                   {exp.bullets[0] && (
                     <View style={s.bullet}>
@@ -310,10 +331,10 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
           </View>
         ) : null
       case "education":
-        return education.length > 0 ? (
+        return visibleEducation.length > 0 ? (
           <View key={id}>
             <SectionHeader title="Education" />
-            {education.map((edu) => (
+            {visibleEducation.map((edu) => (
               <View key={edu.id} style={s.eduItem}>
                 <View style={s.eduTopRow}>
                   <Text style={s.eduSchool}>{edu.institution}</Text>
@@ -335,10 +356,10 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
           </View>
         ) : null
       case "projects":
-        return projects.length > 0 ? (
+        return visibleProjects.length > 0 ? (
           <View key={id}>
             <SectionHeader title="Projects" />
-            {projects.map((proj) => (
+            {visibleProjects.map((proj) => (
               <View key={proj.id} style={s.projItem}>
                 <View style={s.projTopRow}>
                   <View style={s.projNameRow}>
@@ -364,7 +385,7 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
                     bullet && (
                       <View key={i} style={s.bullet}>
                         <Text style={s.bulletDot}>•</Text>
-                        <Text style={s.bulletText}>{bullet}</Text>
+                        <Text style={s.projBulletText}>{bullet}</Text>
                       </View>
                     ),
                 )}
@@ -397,37 +418,62 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
         <View style={s.header}>
           <Text style={s.name}>{profile.name || "Your Name"}</Text>
           {profile.title && <Text style={s.title}>{profile.title}</Text>}
-          <View style={s.contactRow}>
-            {profile.email && (
-              <Link src={`mailto:${profile.email}`} style={s.contactLink}>
-                {profile.email}
-              </Link>
-            )}
-            {profile.phone && (
-              <Link src={`tel:${profile.phone}`} style={s.contactLink}>
-                {profile.phone}
-              </Link>
-            )}
-            {profile.location && (
-              <Text style={s.contactItem}>{profile.location}</Text>
-            )}
-            {profile.linkedin && (
-              <Link
-                src={profile.linkedin.startsWith("http") ? profile.linkedin : `https://${profile.linkedin}`}
-                style={s.contactLink}
-              >
-                {profile.linkedin}
-              </Link>
-            )}
-            {profile.website && (
-              <Link
-                src={profile.website.startsWith("http") ? profile.website : `https://${profile.website}`}
-                style={s.contactLink}
-              >
-                {profile.website}
-              </Link>
-            )}
-          </View>
+          {(() => {
+            const row1: React.ReactNode[] = []
+            const row2: React.ReactNode[] = []
+            if (profile.email)
+              row1.push(
+                <Link key="email" src={`mailto:${profile.email}`} style={s.contactLink}>
+                  <Text style={s.contactLink}>{profile.email}</Text>
+                </Link>
+              )
+            if (profile.phone)
+              row1.push(
+                <Link key="phone" src={`tel:${profile.phone}`} style={s.contactLink}>
+                  <Text style={s.contactLink}>{profile.phone}</Text>
+                </Link>
+              )
+            if (profile.location)
+              row1.push(
+                <Text key="loc" style={s.contactItem}>{profile.location}</Text>
+              )
+            if (profile.linkedin) {
+              const liHandle = profile.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, "").replace(/\/$/, "")
+              row2.push(
+                <Link key="li" src={`https://linkedin.com/in/${liHandle}`} style={s.contactLink}>
+                  <Text style={s.contactLink}>{`linkedin.com/in/${liHandle}`}</Text>
+                </Link>
+              )
+            }
+            if (profile.github) {
+              const ghHandle = profile.github.replace(/^https?:\/\/(www\.)?github\.com\//, "").replace(/\/$/, "")
+              row2.push(
+                <Link key="gh" src={`https://github.com/${ghHandle}`} style={s.contactLink}>
+                  <Text style={s.contactLink}>{`github.com/${ghHandle}`}</Text>
+                </Link>
+              )
+            }
+            if (profile.website) {
+              const webHref = profile.website.startsWith("http") ? profile.website : `https://${profile.website}`
+              row2.push(
+                <Link key="web" src={webHref} style={s.contactLink}>
+                  <Text style={s.contactLink}>{profile.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</Text>
+                </Link>
+              )
+            }
+            const withSeps = (items: React.ReactNode[]) =>
+              items.flatMap((item, i) =>
+                i < items.length - 1
+                  ? [item, <Text key={`sep-${i}`} style={s.contactSep}>|</Text>]
+                  : [item]
+              )
+            return (
+              <>
+                {row1.length > 0 && <View style={s.contactRow}>{withSeps(row1)}</View>}
+                {row2.length > 0 && <View style={s.contactRow}>{withSeps(row2)}</View>}
+              </>
+            )
+          })()}
         </View>
 
         {/* Summary */}
@@ -439,7 +485,7 @@ export function ResumeTemplate({ data }: ResumeTemplateProps) {
         )}
 
         {/* Dynamic sections in user-defined order */}
-        {order.map(renderSection)}
+        {order.map(renderSection).filter(Boolean)}
       </Page>
     </Document>
   )

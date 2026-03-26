@@ -5,6 +5,7 @@ export interface ProfileData {
   phone: string
   location: string
   linkedin: string
+  github: string
   website: string
   summary: string
 }
@@ -18,6 +19,7 @@ export interface ExperienceItem {
   endDate: string
   current: boolean
   bullets: string[]
+  hidden?: boolean
 }
 
 export interface EducationItem {
@@ -30,6 +32,7 @@ export interface EducationItem {
   gpa?: string
   honors?: string
   description?: string
+  hidden?: boolean
 }
 
 export interface SkillCategory {
@@ -45,6 +48,7 @@ export interface ProjectItem {
   technologies: string
   url?: string
   bullets: string[]
+  hidden?: boolean
 }
 
 export interface CertificationItem {
@@ -77,6 +81,7 @@ export interface ResumeData {
   projects: ProjectItem[]
   certifications: CertificationItem[]
   sectionOrder?: SectionId[]
+  hiddenSections?: SectionId[]
 }
 
 export interface CoverLetterData {
@@ -133,6 +138,7 @@ export const DEFAULT_RESUME_DATA: ResumeData = {
     phone: "",
     location: "",
     linkedin: "",
+    github: "",
     website: "",
     summary: "",
   },

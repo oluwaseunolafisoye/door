@@ -14,7 +14,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { ArrowRight, Trash2, Inbox } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -71,88 +70,82 @@ export default function HistoryPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {applications.map((app: Doc<"applications">) => (
-            <Card key={app._id} className={cn("group relative", glassCard)}>
-              <CardContent className="flex h-full flex-col justify-between p-5">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Badge
-                      variant="secondary"
-                      className={cn(
-                        "text-[10px]",
-                        app.status === "completed" &&
-                          "bg-[#a4f5a6]/20 text-[#a4f5a6]",
-                        app.status === "processing" &&
-                          "bg-amber-500/20 text-amber-400",
-                        app.status === "failed" &&
-                          "bg-destructive/20 text-red-400"
-                      )}
-                    >
-                      {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                    </Badge>
-                    <p className="text-[10px] text-white/30">
-                      {new Date(app.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <h3 className="text-sm leading-snug font-medium text-white">
-                    {app.jobTitle}
-                  </h3>
-                  <p className="text-xs text-white/50">{app.company}</p>
-                </div>
-
-                <div className="mt-4 flex items-center justify-between">
-                  <Dialog>
-                    <DialogTrigger>
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setDeletingId(app._id)
-                        }}
-                        className="text-white/30 hover:bg-white/10 hover:text-red-400"
+        <>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {applications.map((app: Doc<"applications">) => (
+              <Card key={app._id} className={cn("group relative", glassCard)}>
+                <CardContent className="flex h-full flex-col justify-between p-5">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "text-[10px]",
+                          app.status === "completed" &&
+                            "bg-[#a4f5a6]/20 text-[#a4f5a6]",
+                          app.status === "processing" &&
+                            "bg-amber-500/20 text-amber-400",
+                          app.status === "failed" &&
+                            "bg-destructive/20 text-red-400"
+                        )}
                       >
-                        <Trash2 className="size-3" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Delete Application</DialogTitle>
-                        <DialogDescription>
-                          This will permanently delete the tailored CV and cover
-                          letter for &quot;{app.jobTitle}&quot; at {app.company}
-                          . This action cannot be undone.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter>
-                        <Button
-                          variant="outline"
-                          onClick={() => setDeletingId(null)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button variant="destructive" onClick={handleDelete}>
-                          Delete
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                        {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                      </Badge>
+                      <p className="text-[10px] text-white/30">
+                        {new Date(app.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <h3 className="text-sm leading-snug font-medium text-white">
+                      {app.jobTitle}
+                    </h3>
+                    <p className="text-xs text-white/50">{app.company}</p>
+                  </div>
 
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-1 text-xs text-white/50 hover:bg-white/10 hover:text-white"
-                    onClick={() => router.push(`/application/${app._id}`)}
-                  >
-                    Open
-                    <ArrowRight className="size-3" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  <div className="mt-4 flex items-center justify-between">
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => setDeletingId(app._id)}
+                      className="text-white/30 hover:bg-white/10 hover:text-red-400"
+                    >
+                      <Trash2 className="size-3" />
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1 text-xs text-white/50 hover:bg-white/10 hover:text-white"
+                      onClick={() => router.push(`/application/${app._id}`)}
+                    >
+                      Open
+                      <ArrowRight className="size-3" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Dialog open={!!deletingId} onOpenChange={(open) => { if (!open) setDeletingId(null) }}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete Application</DialogTitle>
+                <DialogDescription>
+                  This will permanently delete the tailored CV and cover letter.
+                  This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDeletingId(null)}>
+                  Cancel
+                </Button>
+                <Button variant="destructive" onClick={handleDelete}>
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
       )}
     </div>
   )

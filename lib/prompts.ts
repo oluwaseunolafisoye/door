@@ -51,6 +51,7 @@ Return a JSON object with this exact structure:
     "phone": "string",
     "location": "string",
     "linkedin": "string (URL or empty)",
+    "github": "string (URL or empty)",
     "website": "string (URL or empty)",
     "summary": "string (professional summary or objective)"
   },
@@ -105,6 +106,10 @@ Return a JSON object with this exact structure:
   ]
 }
 
+IMPORTANT: Normalize ALL dates to 'MMM YYYY' format (e.g., 'Jun 2023', 'Jan 2020'). Use 'Present' for current roles. Never output full month names or numeric date formats.
+
+IMPORTANT: Strip all first-person pronouns (I, me, my, we, our) from every field — summary, bullets, descriptions. Rewrite any first-person sentences into implied third-person resume style (e.g., "I built a dashboard" → "Built a dashboard").
+
 Parse this resume text:
 
 ${rawText}
@@ -132,27 +137,36 @@ ${jobDescription}
 ## INSTRUCTIONS FOR RESUME TAILORING
 
 ### PRIME DIRECTIVE: 90%+ KEYWORD MATCH
-Your #1 goal is to make this resume look like the job was written specifically for this candidate. The tailored resume MUST contain at least 90% of the keywords, technologies, tools, frameworks, and skills mentioned in the job description. Every single keyword from the JD must appear somewhere in the resume — in the summary, skills, experience bullets, or projects.
+Your #1 goal is to make this resume look like the job was written specifically for this candidate. The tailored resume MUST contain at least 90% of the keywords, technologies, tools, frameworks, and skills mentioned in the job description. Keywords should appear in the skills section, experience bullets, or projects — NOT in the summary (the summary has its own rules below).
 
 ### KEYWORD SATURATION STRATEGY
 Before writing anything, extract EVERY keyword/skill/technology/tool/methodology from the job description. Then ensure EACH one appears in the resume using this priority:
 1. **Skills section**: Add ALL technologies and tools from the JD to the skills section. If the candidate has ANY adjacent experience (e.g., they know React → they can list Next.js; they know Python → they can list Flask/Django; they know AWS → they can list specific services), add those JD keywords to skills.
 2. **Experience bullets**: Rewrite bullets to explicitly name the technologies, methodologies, and practices from the JD. If the JD says "microservices" and a bullet describes building "independent services", rewrite it to say "microservices". Use the EXACT terminology from the JD.
-3. **Summary**: The professional summary must hit at least 8-10 major keywords from the JD in the first 2-3 sentences.
-4. **Projects**: Mention JD-relevant technologies in project descriptions.
+3. **Projects**: Mention JD-relevant technologies in project descriptions.
+4. **Summary**: Do NOT stuff keywords into the summary. The summary is handled separately — see the Summary section below.
 
 ### KEYWORD MATCHING RULES
 - Use the EXACT terms from the JD. If the JD says "CI/CD pipelines", write "CI/CD pipelines" — not "continuous integration" or "deployment automation"
 - If the JD mentions a tool the candidate hasn't used but has used a similar alternative (e.g., JD says "Jest" and candidate used "Mocha"), add BOTH — mention the JD keyword as a known tool alongside the one they used
 - Every technology stack keyword (languages, frameworks, databases, cloud services, tools) from the JD MUST appear in the Skills section at minimum
-- Soft skills and methodologies from the JD (e.g., "Agile", "cross-functional", "stakeholder management") must appear in experience bullets or summary
+- Soft skills and methodologies from the JD (e.g., "Agile", "cross-functional", "stakeholder management") must appear in experience bullets
 
 ### CARL Framework
 Rewrite EVERY experience bullet using the CARL framework:
    - Context: Brief situation/challenge
-   - Action: What was done (start with a STRONG action verb) — MUST reference JD-specific technologies and practices
-   - Result: Measurable outcome with numbers/percentages where possible
+   - Action: What was done (start with a STRONG action verb) — MUST reference JD-specific technologies and practices. Be technically specific: name the exact tools, languages, APIs, patterns, or architectures used. Don't just say "built a system" — say "built a distributed event-driven system using Kafka and Redis".
+   - Result: Measurable outcome with numbers/percentages where possible. Metrics MUST be directly tied to the engineering task described — don't attach a generic "improved efficiency by 30%" to an unrelated action. If the bullet describes migrating a database, the metric should relate to migration speed, data integrity, downtime reduction, etc. — not a vague business outcome.
    - Learning: (weave in implicitly, don't make it a separate clause)
+
+### TECHNICAL DEPTH
+Bullets must demonstrate real engineering work, not just high-level summaries. Every bullet should make it clear WHAT was built and HOW at a technical level:
+   - BAD: "Improved application performance by 40%"
+   - GOOD: "Profiled and eliminated N+1 queries in the order pipeline using Dataloader batching, reducing API response times from 1.2s to 350ms (70% improvement)"
+   - BAD: "Led development of a web application using modern technologies"
+   - GOOD: "Architected a Next.js 14 app with server components and streaming SSR, integrating a PostgreSQL backend via Prisma ORM with row-level security for multi-tenant isolation"
+
+Metrics should feel earned — they must flow naturally from the technical action described. Never attach a percentage improvement that doesn't logically follow from the specific work in the bullet.
 
 ### Action Verbs
 Start each bullet with one of these powerful verbs:
@@ -160,8 +174,45 @@ Start each bullet with one of these powerful verbs:
    
    NEVER use weak verbs like: Helped, Assisted, Worked on, Was responsible for, Participated in
 
-### Summary
-Rewrite the professional summary to be a near-perfect mirror of the JD requirements. It should read like the candidate wrote their summary specifically for this role. Pack it with JD keywords while keeping it natural and confident. Mention the company by name.
+### No First-Person Language
+NEVER use first-person pronouns (I, me, my, we, our) in any resume content — bullets, summary, or skills. Resume writing is always third-person implied. Focus on the technical challenge and the solution, not the narrator.
+   - BAD: "I experienced issues with database latency and resolved them by adding indexes"
+   - GOOD: "Diagnosed database latency bottleneck in the payments service and resolved it by adding composite indexes on high-cardinality columns, reducing p95 query time from 800ms to 45ms"
+
+### Date Formatting
+ALL dates throughout the resume MUST use the format 'MMM YYYY' (e.g., 'Jun 2023', 'Jan 2020', 'Mar 2025'). This applies to experience dates, education dates, certification dates, and project dates. Use 'Present' for current roles. Never use full month names ('June 2023'), numeric formats ('06/2023'), or other variations.
+
+### Summary — CRITICAL: READ CAREFULLY
+The summary is the MOST IMPORTANT section to get right. It must sound like a real human wrote it. If the summary sounds like a LinkedIn bot or an ATS-optimized template, you have FAILED.
+
+BANNED phrases — if ANY of these appear in the summary, it is wrong:
+- "X+ years of experience"
+- "specializing in [list of technologies]"
+- "proven track record"
+- "passionate about"
+- "leveraging"
+- "cutting-edge" / "state-of-the-art"
+- "excited to contribute to [Company]"
+- "results-driven" / "detail-oriented" / "self-motivated"
+- "expert in" / "proficient in"
+- Any company name
+- Any comma-separated list of technologies (e.g., "React, TypeScript, and Node.js")
+
+WHAT TO WRITE:
+- 2-3 short sentences describing what kind of work this person does and what they care about
+- Write it like a real engineer would describe themselves in a conversation — casual confidence, not corporate speak
+- You can reference the DOMAIN of the JD naturally (e.g., if the job is about data pipelines, say "focused on building data systems that teams actually trust" — NOT "experienced in data pipeline engineering and ETL processes")
+- Keep it under 40 words. Shorter is better.
+
+GOOD examples:
+- "Engineer who cares most about shipping fast without cutting corners. Happiest building product-facing features and the infrastructure behind them."
+- "Frontend-leaning full-stack developer. Builds interfaces that feel fast and backends that stay boring. Thinks a lot about component architecture and developer experience."
+- "Generalist engineer comfortable across the stack. Tends to gravitate toward performance-sensitive systems and messy data problems."
+
+BAD examples (DO NOT write anything like these):
+- "Software Engineer with 5+ years of experience specializing in React, TypeScript, and scalable frontend architectures. Proven track record of delivering high-quality production-grade web apps."
+- "Experienced full-stack developer proficient in JavaScript, Python, AWS, and microservices. Passionate about leveraging cutting-edge technologies to build innovative solutions."
+- "Results-driven engineer with expertise in cloud-native architectures, CI/CD pipelines, and agile methodologies. Excited to contribute to Company's mission."
 
 ### Skills Section
 - Reorganize to put the most JD-relevant skills FIRST

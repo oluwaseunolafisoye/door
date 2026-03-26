@@ -12,6 +12,8 @@ import {
   ChevronUp,
   ChevronDown,
   ArrowRight,
+  Eye,
+  EyeOff,
 } from "lucide-react"
 
 interface ExperienceSectionProps {
@@ -100,15 +102,24 @@ export function ExperienceSection({
       </div>
 
       {data.map((item, itemIdx) => (
-        <div key={item.id} className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-4">
+        <div key={item.id} className={`space-y-3 rounded-lg border border-white/10 bg-white/5 p-4 ${item.hidden ? "opacity-40" : ""}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
               <GripVertical className="size-3.5 text-muted-foreground" />
               <span className="text-xs font-medium text-muted-foreground">
                 {item.company || `Position ${itemIdx + 1}`}
+                {item.hidden && <span className="ml-1.5 text-white/20">(hidden)</span>}
               </span>
             </div>
             <div className="flex items-center gap-0.5">
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => updateItem(itemIdx, { hidden: !item.hidden })}
+                title={item.hidden ? "Show in PDF" : "Hide from PDF"}
+              >
+                {item.hidden ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+              </Button>
               <Button
                 variant="ghost"
                 size="icon-xs"

@@ -25,6 +25,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     emailAndPassword: {
       enabled: true,
     },
+    trustedOrigins: ["http://localhost:3000", "https://door-three-neon.vercel.app"],
     plugins: [convex({ authConfig })],
   } satisfies BetterAuthOptions
 }
